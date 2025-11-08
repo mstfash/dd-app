@@ -1,0 +1,16 @@
+<svg width="320" height="320" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Double Dribble Logo</title>
+  <desc id="desc">Stylised DD monogram inside a basketball outline.</desc>
+  <rect width="320" height="320" rx="32" fill="#050608"/>
+  <g transform="translate(32 32)" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="128" cy="128" r="120" stroke="#FF7A21" stroke-width="12" fill="none"/>
+    <path d="M8 128h240" stroke="#FF7A21" stroke-width="12"/>
+    <path d="M128 8c38 32 60 72 60 112s-22 80-60 112" stroke="#FF7A21" stroke-width="12"/>
+    <path d="M128 8c-38 32-60 72-60 112s22 80 60 112" stroke="#FF7A21" stroke-width="12"/>
+  </g>
+  <g transform="translate(72 72)" fill="#ffffff">
+    <path d="M40 0h64c44 0 72 28 72 72s-28 72-72 72H40V0zm58 120c30 0 46-16 46-48s-16-48-46-48H64v96h34z"/>
+    <path d="M112 0h64c44 0 72 28 72 72s-28 72-72 72h-64V0zm58 120c30 0 46-16 46-48s-16-48-46-48h-34v96h34z" opacity="0.85"/>
+  </g>
+</svg>
+

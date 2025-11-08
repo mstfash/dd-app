@@ -1,0 +1,355 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Arabic Font */
+@import url('https://fonts.googleapis.com/css2?family=Aref+Ruqaa+Ink:wght@400;700&display=swap');
+
+.arabic-title {
+  font-family: 'Aref Ruqaa Ink', serif;
+  direction: rtl;
+  text-shadow: 0 4px 8px rgba(255, 111, 31, 0.3);
+  letter-spacing: 0.05em;
+}
+/* Font Rendering Optimizations */
+html {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: always;
+}
+
+/* Font Display Settings */
+@keyframes glow {
+  0%,
+  100% {
+    box-shadow: 0 0 30px rgba(255, 111, 31, 0.3);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 50px rgba(255, 111, 31, 0.5);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 0.9;
+  }
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 2rem rgba(255, 111, 31, 0.2));
+    transform: translateY(0);
+  }
+  50% {
+    filter: drop-shadow(0 0 3rem rgba(255, 111, 31, 0.4));
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.05);
+  }
+}
+
+@layer base {
+  @font-face {
+    font-family: 'Orbitron';
+    font-display: swap;
+    font-weight: 400 700;
+  }
+
+  @font-face {
+    font-family: 'Inter';
+    font-display: swap;
+    font-weight: 400 700;
+  }
+}
+
+/* Base transition class */
+.smooth-transition {
+  @apply transition-all duration-500 ease-in-out;
+}
+
+/* Arabic Font */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;500;600;700&display=swap');
+
+.arabic {
+  font-family: 'Noto Naskh Arabic', serif;
+  direction: rtl;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(6px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes scale {
+  0% {
+    transform: scale(0.98);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes rotate-bg {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+  background-color: #0b0d14;
+  color: #f6f7fb;
+  overflow-x: hidden !important;
+  scroll-padding-top: 2rem;
+  overscroll-behavior-y: contain;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: #070c1a;
+  color: #f6f7fb;
+}
+
+/* Performance optimizations */
+* {
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Optimize animations for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Mobile-friendly tap targets */
+@media (max-width: 768px) {
+  /* Prevent overscroll bounce on iOS */
+  html {
+    width: 100vw;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Improve touch targets */
+  /* Fixed registration button styles */
+  .fixed-register-btn {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    border-radius: 0;
+    transform: translateY(50%);
+  }
+
+  button,
+  [role='button'],
+  a.button,
+  input,
+  select {
+    min-height: 48px;
+    min-width: 44px;
+    padding: 0.75rem 1rem;
+    font-size: 16px; /* Prevents iOS zoom on focus */
+    touch-action: manipulation;
+  }
+
+  /* Improve mobile typography */
+  h1 {
+    font-size: clamp(2rem, 8vw, 4rem);
+  }
+  h2 {
+    font-size: clamp(1.5rem, 6vw, 3rem);
+  }
+  h3 {
+    font-size: clamp(1.25rem, 4vw, 2rem);
+  }
+  p {
+    font-size: clamp(0.875rem, 4vw, 1rem);
+  }
+
+  /* Better spacing on mobile */
+  .container.mx-auto {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Improved touch targets */
+  .space-y-4 > * {
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  /* Optimize animations for mobile */
+  .transition-all {
+    transition-duration: 200ms !important;
+  }
+
+  /* Prevent horizontal scroll */
+  .overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .overflow-x-auto::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Improve form elements on mobile */
+  input[type='date'],
+  input[type='time'] {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  /* Fix sticky positioning on mobile */
+  .sticky,
+  .fixed {
+    position: -webkit-sticky;
+    position: sticky;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+
+  /* Optimize images for mobile */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Smooth parallax scrolling */
+@supports (scroll-behavior: smooth) {
+  html,
+  body {
+    scroll-behavior: smooth;
+    scroll-padding-top: 2rem;
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+button,
+a,
+input,
+select,
+.transition-all {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity, background-color, border-color;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Improved focus styles */
+:focus-visible {
+  outline: 3px solid #ff6f1f;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(255, 111, 31, 0.3);
+  border-radius: inherit;
+}
+
+input,
+select {
+  color: #2b2b2b;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ff6f1f;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ffc29a;
+}
+
+.drop-shadow-glow {
+  filter: drop-shadow(0 0.25rem 1.2rem rgba(255, 111, 31, 0.45));
+}
+
+@keyframes progress {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.progress-bar {
+  animation: progress 45s linear infinite;
+  animation-play-state: running;
+  will-change: width;
+  transform: translateZ(0);
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0.8;
+}
+
+.progress-bar.paused {
+  animation-play-state: paused;
+  opacity: 0.3;
+}
