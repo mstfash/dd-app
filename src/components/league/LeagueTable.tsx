@@ -1,5 +1,5 @@
 import { Table, Info, LayoutGrid, LayoutList } from 'lucide-react';
-import { LeagueTableType } from '../../utils/types';
+import { LeagueTableType, TableType } from '../../utils/types';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
@@ -52,11 +52,17 @@ export default function LeagueTable({
       ];
     } else if (sportType === 'basketball') {
       return [
-        ...commonHeaders,
-        { key: 'PF', label: 'PF', tooltip: 'Points For' },
-        { key: 'PA', label: 'PA', tooltip: 'Points Against' },
-        { key: 'PD', label: 'PD', tooltip: 'Points Difference' },
-        { key: 'PTS', label: 'PTS', tooltip: 'Points' },
+        { key: 'position', label: '#', tooltip: 'Position' },
+        { key: 'team', label: 'Team', tooltip: 'Team Name' },
+        { key: 'W', label: 'W', tooltip: 'Wins' },
+        { key: 'L', label: 'L', tooltip: 'Losses' },
+        { key: 'pct', label: 'Pct', tooltip: 'Win Percentage' },
+        { key: 'gb', label: 'GB', tooltip: 'Games Behind Leader' },
+        { key: 'conf', label: 'Conf', tooltip: 'Conference Record' },
+        { key: 'home', label: 'Home', tooltip: 'Home Record' },
+        { key: 'away', label: 'Away', tooltip: 'Away Record' },
+        { key: 'l10', label: 'L10', tooltip: 'Last 10 Games' },
+        { key: 'strk', label: 'Strk', tooltip: 'Current Streak' },
       ];
     } else if (sportType === 'padel') {
       return [
@@ -73,7 +79,123 @@ export default function LeagueTable({
   };
   const tableData = getFilteredData();
   const headers = getColumnHeaders();
+  const statHeaders = headers.filter(
+    (header) => header.key !== 'team' && header.key !== 'position'
+  );
   const navigate = useNavigate();
+
+  const resolveTeamValue = (team: TableType, key: string) => {
+    const lookupKeys = [
+      key,
+      key.toUpperCase(),
+      key.toLowerCase(),
+    ];
+
+    switch (key.toLowerCase()) {
+      case 'pct':
+        lookupKeys.push('winPercentage');
+        break;
+      case 'gb':
+        lookupKeys.push('gamesBehind');
+        break;
+      case 'conf':
+        lookupKeys.push('conferenceRecord');
+        break;
+      case 'home':
+        lookupKeys.push('homeRecord');
+        break;
+      case 'away':
+        lookupKeys.push('awayRecord');
+        break;
+      case 'l10':
+        lookupKeys.push('lastTenRecord');
+        break;
+      case 'strk':
+        lookupKeys.push('streak');
+        break;
+      case 'pf':
+        lookupKeys.push('GF');
+        break;
+      case 'pa':
+        lookupKeys.push('GA');
+        break;
+      case 'pd':
+        lookupKeys.push('GD');
+        break;
+      default:
+        break;
+    }
+
+    const record = team as unknown as Record<string, string | number | undefined>;
+    for (const lookupKey of lookupKeys) {
+      const value = record[lookupKey];
+      if (value !== undefined && value !== null && value !== '') {
+        return value;
+      }
+    }
+
+    return undefined;
+  };
+
+  const getTeamStatDisplay = (team: TableType, key: string) => {
+    const value = resolveTeamValue(team, key);
+    if (value === undefined) return '-';
+    if (typeof value === 'number') return value.toString();
+    return value;
+  };
+
+  const getStatClassName = (key: string, value: string) => {
+    const normalized = key.toLowerCase();
+    if (normalized === 'pct') {
+      return 'text-sm font-semibold text-brand-700';
+    }
+    if (normalized === 'strk') {
+      if (value.toUpperCase().startsWith('W')) {
+        return 'text-sm font-semibold text-green-600';
+      }
+      if (value.toUpperCase().startsWith('L')) {
+        return 'text-sm font-semibold text-red-500';
+      }
+      return 'text-sm text-brand-500';
+    }
+    if (normalized === 'pd' || normalized === 'gd') {
+      const numeric = Number(value);
+      if (!Number.isNaN(numeric)) {
+        if (numeric > 0) return 'text-sm font-semibold text-green-600';
+        if (numeric < 0) return 'text-sm font-semibold text-red-500';
+      }
+    }
+    if (normalized === 'pts') {
+      return 'text-sm font-semibold text-brand-700';
+    }
+    return 'text-sm text-brand-500';
+  };
+
+  const formatStatValue = (key: string, value: string) => {
+    const normalized = key.toLowerCase();
+    if (value === undefined || value === null || value === '') {
+      return '-';
+    }
+    if (normalized === 'pct') {
+      const parsed = Number(value);
+      if (!Number.isNaN(parsed)) {
+        return parsed.toFixed(3);
+      }
+      return value;
+    }
+    if (normalized === 'pd' || normalized === 'gd') {
+      const numeric = Number(value);
+      if (!Number.isNaN(numeric)) {
+        return numeric > 0 ? `+${numeric}` : numeric.toString();
+      }
+    }
+    if (normalized === 'gb') {
+      if (['0', '0.0', '0.00', '0.000'].includes(value)) {
+        return '—';
+      }
+    }
+    return value;
+  };
 
   return (
     <div>
@@ -146,7 +268,9 @@ export default function LeagueTable({
                     <tbody className="bg-white divide-y divide-brand-100">
                       {leagueData.table
                         .filter((team) => team.group === group)
-                        .map((team, index) => (
+                        .map((team, index) => {
+                          const displayPosition = index + 1;
+                          return (
                           <tr
                             key={team.partId}
                             className="hover:bg-brand-50 transition-colors"
@@ -154,12 +278,12 @@ export default function LeagueTable({
                             <td className="px-4 py-4 whitespace-nowrap">
                               <div
                                 className={`text-sm font-medium ${
-                                  index < 2
+                                  displayPosition <= 2
                                     ? 'text-peach-400'
                                     : 'text-brand-700'
                                 }`}
                               >
-                                {index + 1}
+                                {displayPosition}
                               </div>
                             </td>
                             <td className="px-4 py-4 whitespace-nowrap">
@@ -172,7 +296,7 @@ export default function LeagueTable({
                               >
                                 <div
                                   className={`text-sm font-medium ${
-                                    index < 2
+                                    displayPosition <= 2
                                       ? 'text-peach-400'
                                       : 'text-brand-700'
                                   }`}
@@ -181,119 +305,20 @@ export default function LeagueTable({
                                 </div>
                               </div>
                             </td>
-                            <td className="px-4 py-4 whitespace-nowrap">
-                              <div className="text-sm text-brand-400">
-                                {team.MP}
-                              </div>
-                            </td>
-                            <td className="px-4 py-4 whitespace-nowrap">
-                              <div className="text-sm text-brand-400">
-                                {team.W}
-                              </div>
-                            </td>
-                            <td className="px-4 py-4 whitespace-nowrap">
-                              <div className="text-sm text-brand-400">
-                                {team.L}
-                              </div>
-                            </td>
-                            {sportType === 'football' ||
-                            sportType === 'padbol' ? (
-                              <>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <div className="text-sm text-brand-400">
-                                    {team.D}
+                            {statHeaders.map((header) => {
+                              const rawValue = getTeamStatDisplay(team, header.key);
+                              const displayValue = formatStatValue(header.key, rawValue);
+                              return (
+                                <td key={header.key} className="px-4 py-4 whitespace-nowrap">
+                                  <div className={getStatClassName(header.key, rawValue)}>
+                                    {displayValue}
                                   </div>
                                 </td>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <div className="text-sm text-brand-400">
-                                    {team.GF}
-                                  </div>
-                                </td>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <div className="text-sm text-brand-400">
-                                    {team.GA}
-                                  </div>
-                                </td>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <div
-                                    className={`text-sm ${
-                                      parseInt(team.GD) > 0
-                                        ? 'text-green-600'
-                                        : parseInt(team.GD) < 0
-                                        ? 'text-red-500'
-                                        : 'text-brand-400'
-                                    }`}
-                                  >
-                                    {parseInt(team.GD) > 0
-                                      ? `+${team.GD}`
-                                      : team.GD}
-                                  </div>
-                                </td>
-                              </>
-                            ) : sportType === 'basketball' ? (
-                              <>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <div className="text-sm text-brand-400">
-                                    {team.PF ?? team.GF}
-                                  </div>
-                                </td>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <div className="text-sm text-brand-400">
-                                    {team.PA ?? team.GA}
-                                  </div>
-                                </td>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <div
-                                    className={`text-sm ${
-                                      parseInt(team.PD ?? team.GD) > 0
-                                        ? 'text-green-600'
-                                        : parseInt(team.PD ?? team.GD) < 0
-                                        ? 'text-red-500'
-                                        : 'text-brand-400'
-                                    }`}
-                                  >
-                                    {parseInt(team.PD ?? team.GD) > 0
-                                      ? `+${team.PD ?? team.GD}`
-                                      : team.PD ?? team.GD}
-                                  </div>
-                                </td>
-                              </>
-                            ) : sportType === 'padel' ? (
-                              <>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <div className="text-sm text-brand-400">
-                                    {team.SF ?? team.GF}
-                                  </div>
-                                </td>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <div className="text-sm text-brand-400">
-                                    {team.SA ?? team.GA}
-                                  </div>
-                                </td>
-                                <td className="px-4 py-4 whitespace-nowrap">
-                                  <div
-                                    className={`text-sm ${
-                                      parseInt(team.SD ?? team.GD) > 0
-                                        ? 'text-green-600'
-                                        : parseInt(team.SD ?? team.GD) < 0
-                                        ? 'text-red-500'
-                                        : 'text-brand-400'
-                                    }`}
-                                  >
-                                    {parseInt(team.SD ?? team.GD) > 0
-                                      ? `+${team.SD ?? team.GD}`
-                                      : team.SD ?? team.GD}
-                                  </div>
-                                </td>
-                              </>
-                            ) : null}
-                            <td className="px-4 py-4 whitespace-nowrap">
-                              <div className="text-sm font-bold text-brand-700">
-                                {team.PTS}
-                              </div>
-                            </td>
+                              );
+                            })}
                           </tr>
-                        ))}
+                        );
+                        })}
                     </tbody>
                   </table>
                 </div>
@@ -354,102 +379,17 @@ export default function LeagueTable({
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm text-brand-400">{team.MP}</div>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm text-brand-400">{team.W}</div>
-                  </td>
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm text-brand-400">{team.L}</div>
-                  </td>
-                  {sportType === 'football' || sportType === 'padbol' ? (
-                    <>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-sm text-brand-400">{team.D}</div>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-sm text-brand-400">{team.GF}</div>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-sm text-brand-400">{team.GA}</div>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div
-                          className={`text-sm ${
-                            parseInt(team.GD) > 0
-                              ? 'text-green-600'
-                              : parseInt(team.GD) < 0
-                              ? 'text-red-500'
-                              : 'text-brand-400'
-                          }`}
-                        >
-                          {parseInt(team.GD) > 0 ? `+${team.GD}` : team.GD}
+                  {statHeaders.map((header) => {
+                    const rawValue = getTeamStatDisplay(team, header.key);
+                    const displayValue = formatStatValue(header.key, rawValue);
+                    return (
+                      <td key={header.key} className="px-4 py-4 whitespace-nowrap">
+                        <div className={getStatClassName(header.key, rawValue)}>
+                          {displayValue}
                         </div>
                       </td>
-                    </>
-                  ) : sportType === 'basketball' ? (
-                    <>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-sm text-brand-400">
-                          {team.PF ?? team.GF}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-sm text-brand-400">
-                          {team.PA ?? team.GA}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div
-                          className={`text-sm ${
-                            parseInt(team.PD ?? team.GD) > 0
-                              ? 'text-green-600'
-                              : parseInt(team.PD ?? team.GD) < 0
-                              ? 'text-red-500'
-                              : 'text-brand-400'
-                          }`}
-                        >
-                          {parseInt(team.PD ?? team.GD) > 0
-                            ? `+${team.PD ?? team.GD}`
-                            : team.PD ?? team.GD}
-                        </div>
-                      </td>
-                    </>
-                  ) : sportType === 'padel' ? (
-                    <>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-sm text-brand-400">
-                          {team.SF ?? team.GF}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div className="text-sm text-brand-400">
-                          {team.SA ?? team.GA}
-                        </div>
-                      </td>
-                      <td className="px-4 py-4 whitespace-nowrap">
-                        <div
-                          className={`text-sm ${
-                            parseInt(team.SD ?? team.GD) > 0
-                              ? 'text-green-600'
-                              : parseInt(team.SD ?? team.GD) < 0
-                              ? 'text-red-500'
-                              : 'text-brand-400'
-                          }`}
-                        >
-                          {parseInt(team.SD ?? team.GD) > 0
-                            ? `+${team.SD ?? team.GD}`
-                            : team.SD ?? team.GD}
-                        </div>
-                      </td>
-                    </>
-                  ) : null}
-                  <td className="px-4 py-4 whitespace-nowrap">
-                    <div className="text-sm font-bold text-brand-700">
-                      {team.PTS}
-                    </div>
-                  </td>
+                    );
+                  })}
                 </tr>
               ))}
             </tbody>

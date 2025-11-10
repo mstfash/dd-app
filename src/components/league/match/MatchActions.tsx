@@ -1,5 +1,28 @@
 import { Trophy } from 'lucide-react';
-import { MatchInterface } from '../../../utils/types';
+import {
+  BasketballMatchSummary,
+  MatchInterface,
+  MatchTimelineAction,
+} from '../../../utils/types';
+import BasketballBoxScore from './BasketballBoxScore';
+
+type TimelineAction = MatchTimelineAction;
+
+const isBasketballSummary = (
+  detail: MatchInterface['actionDetails'][number]
+): detail is BasketballMatchSummary => {
+  if (!detail || typeof detail !== 'object') return false;
+  const sport = (detail as BasketballMatchSummary).sport;
+  return typeof sport === 'string' && sport.toLowerCase() === 'basketball' && 'teams' in detail;
+};
+
+const isTimelineAction = (
+  detail: MatchInterface['actionDetails'][number]
+): detail is MatchTimelineAction => {
+  if (!detail || typeof detail !== 'object') return false;
+  const action = detail as MatchTimelineAction;
+  return typeof action.type === 'string' && typeof action.name === 'string';
+};
 
 const SPORT_ACTIONS = {
   football: {
@@ -46,8 +69,6 @@ const BASKETBALL_POINT_LABELS: Record<string, string> = {
 
 const QUARTER_LABELS = ['Q1', 'Q2', 'Q3', 'Q4'];
 const QUARTER_LENGTH_MINUTES = 12;
-
-type TimelineAction = MatchInterface['actionDetails'][number];
 
 const formatDisplayTime = (time?: string) => {
   if (!time) return '--';
@@ -268,7 +289,15 @@ interface MatchActionsProps {
 }
 
 export default function MatchActions({ match }: MatchActionsProps) {
-  const sortedActions = [...(match?.actionDetails || [])].sort((a, b) => {
+  const basketballSummary = (match?.actionDetails || []).find(isBasketballSummary);
+
+  if (match.type.toLowerCase() === 'basketball' && basketballSummary) {
+    return <BasketballBoxScore summary={basketballSummary} match={match} />;
+  }
+
+  const timelineActions = (match?.actionDetails || []).filter(isTimelineAction);
+
+  const sortedActions = [...timelineActions].sort((a, b) => {
     const timeA = parseActionMinutes(a.time) ?? Number.MAX_SAFE_INTEGER;
     const timeB = parseActionMinutes(b.time) ?? Number.MAX_SAFE_INTEGER;
     return timeA - timeB;

@@ -31,8 +31,8 @@ export default function LeagueDetails() {
   );
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const { currentCompetition, currentSeason } = useLeaguesState(MAIN_LEAGUE_ID);
-  const seasonId = currentSeason?.id as string;
-  const leagueId = currentCompetition?.id as string;
+  const seasonId = currentSeason?.id;
+  const leagueId = currentCompetition?.id;
   const getMatchCategory = (match: MatchInterface) => {
     if (match.stage && match.stage !== 'Group Stage') {
       return match.stage.replace(/-/g, ' ');
@@ -50,8 +50,16 @@ export default function LeagueDetails() {
   };
   const { matches, loading } = useMatches({
     where: {
-      season: { id: { in: [seasonId] } },
-      competition: { id: { in: [leagueId] } },
+      ...(seasonId
+        ? {
+            season: { id: { in: [seasonId] } },
+          }
+        : {}),
+      ...(leagueId
+        ? {
+            competition: { id: { in: [leagueId] } },
+          }
+        : {}),
     },
     pollInterval: 5000,
   });
@@ -96,12 +104,15 @@ export default function LeagueDetails() {
       match.stage !== 'Group Stage'
   );
 
-  const leagueData = generateCompleteLeagueTable(
-    leagueMatches,
-    currentCompetition as Competition,
-    currentSeason as Season,
-    sportType
-  );
+  const leagueData =
+    currentCompetition && currentSeason
+      ? generateCompleteLeagueTable(
+          leagueMatches,
+          currentCompetition as Competition,
+          currentSeason as Season,
+          sportType
+        )
+      : null;
   const [viewMode, setViewMode] = useState<'knockout' | 'table'>(
     isKnockout ? 'knockout' : 'table'
   );
@@ -118,7 +129,7 @@ export default function LeagueDetails() {
     }
   }, [isKnockout]);
 
-  if (loading) {
+  if (loading || !currentCompetition || !currentSeason) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-brand-50">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-700"></div>

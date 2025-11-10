@@ -24,6 +24,125 @@ export type registrationType =
   | 'PLAYER_REGISTRATION'
   | 'TRANSFER_MARKET';
 
+export type NumericStat = number | string | null | undefined;
+
+export interface BasketballPlayerStats {
+  minutes?: string;
+  points?: NumericStat;
+  assists?: NumericStat;
+  rebounds?: NumericStat;
+  offensiveRebounds?: NumericStat;
+  defensiveRebounds?: NumericStat;
+  steals?: NumericStat;
+  blocks?: NumericStat;
+  turnovers?: NumericStat;
+  fouls?: NumericStat;
+  plusMinus?: NumericStat;
+  freeThrowsMade?: NumericStat;
+  freeThrowsAttempted?: NumericStat;
+  twoPointersMade?: NumericStat;
+  twoPointersAttempted?: NumericStat;
+  threePointersMade?: NumericStat;
+  threePointersAttempted?: NumericStat;
+  fieldGoalsMade?: NumericStat;
+  fieldGoalsAttempted?: NumericStat;
+  [key: string]: NumericStat;
+}
+
+export interface BasketballPlayerBoxScore {
+  playerName: string;
+  jerseyNumber?: string;
+  starter?: boolean;
+  position?: string;
+  stats: BasketballPlayerStats;
+}
+
+export interface BasketballTeamLegend {
+  times_tied?: NumericStat;
+  bench_points?: NumericStat;
+  biggest_lead?: NumericStat;
+  lead_changes?: NumericStat;
+  time_with_lead?: string;
+  points_in_paint?: NumericStat;
+  fast_break_points?: NumericStat;
+  biggest_scoring_run?: NumericStat;
+  second_chance_points?: NumericStat;
+  points_from_turnovers?: NumericStat;
+  [key: string]: NumericStat;
+}
+
+export interface BasketballTeamTotals extends BasketballPlayerStats {
+  teamRebounds?: NumericStat;
+  points?: NumericStat;
+}
+
+export interface BasketballTeamCoachingInfo {
+  coach?: string;
+  assistantCoaches?: string[];
+}
+
+export interface BasketballTeamSnapshot {
+  legend?: BasketballTeamLegend;
+  totals?: BasketballTeamTotals;
+  players?: BasketballPlayerBoxScore[];
+  metadata?: BasketballTeamCoachingInfo;
+  teamName?: string;
+}
+
+export interface BasketballQuarterScore {
+  quarter: number | string;
+  home: number;
+  away: number;
+}
+
+export interface BasketballMatchMetadata {
+  homeTeamId?: string;
+  awayTeamId?: string;
+  homeTeamName?: string;
+  awayTeamName?: string;
+  venue?: string;
+  attendance?: string;
+  officials?: string[];
+  [key: string]: NumericStat;
+}
+
+export interface BasketballMatchSummary {
+  sport: 'basketball' | string;
+  teams: {
+    home: BasketballTeamSnapshot;
+    away: BasketballTeamSnapshot;
+    metadata?: BasketballMatchMetadata;
+  };
+  quarters?: BasketballQuarterScore[];
+  scoringByIntervals?: Array<{
+    label: string;
+    home: number;
+    away: number;
+  }>;
+}
+
+export interface MatchTimelineAction {
+  team: string;
+  type: string;
+  time: string;
+  name: string;
+  isHomeTeam: boolean;
+  isFirstHalf: boolean;
+  isOwnGoal: boolean;
+  isInjurySub: boolean;
+  isDirectRedCard: boolean;
+  assistName: string;
+  isPenaltyGoal: boolean;
+  points?: number;
+  pointType?: 'freeThrow' | 'twoPointer' | 'threePointer' | string;
+  quarter?: number | string;
+}
+
+export type MatchActionDetail =
+  | MatchTimelineAction
+  | BasketballMatchSummary
+  | Record<string, unknown>;
+
 export interface MatchInterface {
   isMatchLive: boolean;
   inMatchTime: string;
@@ -78,22 +197,7 @@ export interface MatchInterface {
     position: string;
     playerPhoto: string;
   }>;
-  actionDetails: Array<{
-    team: string;
-    type: string;
-    time: string;
-    name: string;
-    isHomeTeam: boolean;
-    isFirstHalf: boolean;
-    isOwnGoal: boolean;
-    isInjurySub: boolean;
-    isDirectRedCard: boolean;
-    assistName: string;
-    isPenaltyGoal: boolean;
-    points?: number;
-    pointType?: 'freeThrow' | 'twoPointer' | 'threePointer' | string;
-    quarter?: number | string;
-  }>;
+  actionDetails: MatchActionDetail[];
   penalties: Array<{
     team: string;
     type: string;
@@ -218,6 +322,22 @@ export interface TableType {
   group: string;
   scoreSheet: Array<ScoreSheet>;
   participation?: Partial<Participation>;
+  winPercentage?: string;
+  pct?: string;
+  gamesBehind?: string;
+  gb?: string;
+  conferenceRecord?: string;
+  conf?: string;
+  homeRecord?: string;
+  awayRecord?: string;
+  lastTenRecord?: string;
+  l10?: string;
+  streak?: string;
+  strk?: string;
+  pointDiff?: string;
+  diff?: string;
+  pointsForAverage?: string;
+  pointsAgainstAverage?: string;
 }
 export interface TopPlayerType {
   name: string;

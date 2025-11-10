@@ -20,11 +20,577 @@ export type Scalars = {
   Upload: { input: any; output: any; }
 };
 
+export type Arena = {
+  __typename?: 'Arena';
+  description?: Maybe<Scalars['String']['output']>;
+  endDate?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  maxParticipants?: Maybe<Scalars['Int']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  participants?: Maybe<Array<ArenaParticipant>>;
+  participantsCount?: Maybe<Scalars['Int']['output']>;
+  registrationDeadline?: Maybe<Scalars['DateTime']['output']>;
+  season?: Maybe<Season>;
+  startDate?: Maybe<Scalars['DateTime']['output']>;
+  status?: Maybe<Scalars['String']['output']>;
+};
+
+
+export type ArenaParticipantsArgs = {
+  cursor?: InputMaybe<ArenaParticipantWhereUniqueInput>;
+  orderBy?: Array<ArenaParticipantOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: ArenaParticipantWhereInput;
+};
+
+
+export type ArenaParticipantsCountArgs = {
+  where?: ArenaParticipantWhereInput;
+};
+
+export type ArenaCreateInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  maxParticipants?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  participants?: InputMaybe<ArenaParticipantRelateToManyForCreateInput>;
+  registrationDeadline?: InputMaybe<Scalars['DateTime']['input']>;
+  season?: InputMaybe<SeasonRelateToOneForCreateInput>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ArenaManyRelationFilter = {
+  every?: InputMaybe<ArenaWhereInput>;
+  none?: InputMaybe<ArenaWhereInput>;
+  some?: InputMaybe<ArenaWhereInput>;
+};
+
+export type ArenaOrderByInput = {
+  description?: InputMaybe<OrderDirection>;
+  endDate?: InputMaybe<OrderDirection>;
+  id?: InputMaybe<OrderDirection>;
+  maxParticipants?: InputMaybe<OrderDirection>;
+  name?: InputMaybe<OrderDirection>;
+  registrationDeadline?: InputMaybe<OrderDirection>;
+  startDate?: InputMaybe<OrderDirection>;
+  status?: InputMaybe<OrderDirection>;
+};
+
+export type ArenaParticipant = {
+  __typename?: 'ArenaParticipant';
+  arena?: Maybe<Arena>;
+  id: Scalars['ID']['output'];
+  joinedAt?: Maybe<Scalars['DateTime']['output']>;
+  rank?: Maybe<Scalars['Int']['output']>;
+  score?: Maybe<Scalars['Int']['output']>;
+  status?: Maybe<Scalars['String']['output']>;
+  user?: Maybe<User>;
+};
+
+export type ArenaParticipantCreateInput = {
+  arena?: InputMaybe<ArenaRelateToOneForCreateInput>;
+  joinedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  rank?: InputMaybe<Scalars['Int']['input']>;
+  score?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  user?: InputMaybe<UserRelateToOneForCreateInput>;
+};
+
+export type ArenaParticipantManyRelationFilter = {
+  every?: InputMaybe<ArenaParticipantWhereInput>;
+  none?: InputMaybe<ArenaParticipantWhereInput>;
+  some?: InputMaybe<ArenaParticipantWhereInput>;
+};
+
+export type ArenaParticipantOrderByInput = {
+  id?: InputMaybe<OrderDirection>;
+  joinedAt?: InputMaybe<OrderDirection>;
+  rank?: InputMaybe<OrderDirection>;
+  score?: InputMaybe<OrderDirection>;
+  status?: InputMaybe<OrderDirection>;
+};
+
+export type ArenaParticipantRelateToManyForCreateInput = {
+  connect?: InputMaybe<Array<ArenaParticipantWhereUniqueInput>>;
+  create?: InputMaybe<Array<ArenaParticipantCreateInput>>;
+};
+
+export type ArenaParticipantRelateToManyForUpdateInput = {
+  connect?: InputMaybe<Array<ArenaParticipantWhereUniqueInput>>;
+  create?: InputMaybe<Array<ArenaParticipantCreateInput>>;
+  disconnect?: InputMaybe<Array<ArenaParticipantWhereUniqueInput>>;
+  set?: InputMaybe<Array<ArenaParticipantWhereUniqueInput>>;
+};
+
+export type ArenaParticipantUpdateArgs = {
+  data: ArenaParticipantUpdateInput;
+  where: ArenaParticipantWhereUniqueInput;
+};
+
+export type ArenaParticipantUpdateInput = {
+  arena?: InputMaybe<ArenaRelateToOneForUpdateInput>;
+  joinedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  rank?: InputMaybe<Scalars['Int']['input']>;
+  score?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  user?: InputMaybe<UserRelateToOneForUpdateInput>;
+};
+
+export type ArenaParticipantWhereInput = {
+  AND?: InputMaybe<Array<ArenaParticipantWhereInput>>;
+  NOT?: InputMaybe<Array<ArenaParticipantWhereInput>>;
+  OR?: InputMaybe<Array<ArenaParticipantWhereInput>>;
+  arena?: InputMaybe<ArenaWhereInput>;
+  id?: InputMaybe<IdFilter>;
+  joinedAt?: InputMaybe<DateTimeNullableFilter>;
+  rank?: InputMaybe<IntNullableFilter>;
+  score?: InputMaybe<IntNullableFilter>;
+  status?: InputMaybe<StringNullableFilter>;
+  user?: InputMaybe<UserWhereInput>;
+};
+
+export type ArenaParticipantWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type ArenaRelateToManyForCreateInput = {
+  connect?: InputMaybe<Array<ArenaWhereUniqueInput>>;
+  create?: InputMaybe<Array<ArenaCreateInput>>;
+};
+
+export type ArenaRelateToManyForUpdateInput = {
+  connect?: InputMaybe<Array<ArenaWhereUniqueInput>>;
+  create?: InputMaybe<Array<ArenaCreateInput>>;
+  disconnect?: InputMaybe<Array<ArenaWhereUniqueInput>>;
+  set?: InputMaybe<Array<ArenaWhereUniqueInput>>;
+};
+
+export type ArenaRelateToOneForCreateInput = {
+  connect?: InputMaybe<ArenaWhereUniqueInput>;
+  create?: InputMaybe<ArenaCreateInput>;
+};
+
+export type ArenaRelateToOneForUpdateInput = {
+  connect?: InputMaybe<ArenaWhereUniqueInput>;
+  create?: InputMaybe<ArenaCreateInput>;
+  disconnect?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type ArenaUpdateArgs = {
+  data: ArenaUpdateInput;
+  where: ArenaWhereUniqueInput;
+};
+
+export type ArenaUpdateInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  maxParticipants?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  participants?: InputMaybe<ArenaParticipantRelateToManyForUpdateInput>;
+  registrationDeadline?: InputMaybe<Scalars['DateTime']['input']>;
+  season?: InputMaybe<SeasonRelateToOneForUpdateInput>;
+  startDate?: InputMaybe<Scalars['DateTime']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ArenaWhereInput = {
+  AND?: InputMaybe<Array<ArenaWhereInput>>;
+  NOT?: InputMaybe<Array<ArenaWhereInput>>;
+  OR?: InputMaybe<Array<ArenaWhereInput>>;
+  description?: InputMaybe<StringFilter>;
+  endDate?: InputMaybe<DateTimeFilter>;
+  id?: InputMaybe<IdFilter>;
+  maxParticipants?: InputMaybe<IntNullableFilter>;
+  name?: InputMaybe<StringFilter>;
+  participants?: InputMaybe<ArenaParticipantManyRelationFilter>;
+  registrationDeadline?: InputMaybe<DateTimeNullableFilter>;
+  season?: InputMaybe<SeasonWhereInput>;
+  startDate?: InputMaybe<DateTimeFilter>;
+  status?: InputMaybe<StringNullableFilter>;
+};
+
+export type ArenaWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
 export type AuthenticatedItem = User;
+
+export type Badge = {
+  __typename?: 'Badge';
+  description?: Maybe<Scalars['String']['output']>;
+  icon?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  isActive?: Maybe<Scalars['Boolean']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  requirements?: Maybe<Scalars['JSON']['output']>;
+  userBadges?: Maybe<Array<UserBadge>>;
+  userBadgesCount?: Maybe<Scalars['Int']['output']>;
+};
+
+
+export type BadgeUserBadgesArgs = {
+  cursor?: InputMaybe<UserBadgeWhereUniqueInput>;
+  orderBy?: Array<UserBadgeOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: UserBadgeWhereInput;
+};
+
+
+export type BadgeUserBadgesCountArgs = {
+  where?: UserBadgeWhereInput;
+};
+
+export type BadgeCreateInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  icon?: InputMaybe<Scalars['String']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  requirements?: InputMaybe<Scalars['JSON']['input']>;
+  userBadges?: InputMaybe<UserBadgeRelateToManyForCreateInput>;
+};
+
+export type BadgeOrderByInput = {
+  description?: InputMaybe<OrderDirection>;
+  icon?: InputMaybe<OrderDirection>;
+  id?: InputMaybe<OrderDirection>;
+  isActive?: InputMaybe<OrderDirection>;
+  name?: InputMaybe<OrderDirection>;
+};
+
+export type BadgeRelateToOneForCreateInput = {
+  connect?: InputMaybe<BadgeWhereUniqueInput>;
+  create?: InputMaybe<BadgeCreateInput>;
+};
+
+export type BadgeRelateToOneForUpdateInput = {
+  connect?: InputMaybe<BadgeWhereUniqueInput>;
+  create?: InputMaybe<BadgeCreateInput>;
+  disconnect?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type BadgeUpdateArgs = {
+  data: BadgeUpdateInput;
+  where: BadgeWhereUniqueInput;
+};
+
+export type BadgeUpdateInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  icon?: InputMaybe<Scalars['String']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  requirements?: InputMaybe<Scalars['JSON']['input']>;
+  userBadges?: InputMaybe<UserBadgeRelateToManyForUpdateInput>;
+};
+
+export type BadgeWhereInput = {
+  AND?: InputMaybe<Array<BadgeWhereInput>>;
+  NOT?: InputMaybe<Array<BadgeWhereInput>>;
+  OR?: InputMaybe<Array<BadgeWhereInput>>;
+  description?: InputMaybe<StringFilter>;
+  icon?: InputMaybe<StringFilter>;
+  id?: InputMaybe<IdFilter>;
+  isActive?: InputMaybe<BooleanFilter>;
+  name?: InputMaybe<StringFilter>;
+  userBadges?: InputMaybe<UserBadgeManyRelationFilter>;
+};
+
+export type BadgeWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type BeProPlayer = {
+  __typename?: 'BeProPlayer';
+  ability?: Maybe<Scalars['String']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  email?: Maybe<Scalars['String']['output']>;
+  firstName?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  kitSize?: Maybe<Scalars['String']['output']>;
+  lastName?: Maybe<Scalars['String']['output']>;
+  location?: Maybe<Scalars['String']['output']>;
+  paid?: Maybe<Scalars['Boolean']['output']>;
+  phoneNumber?: Maybe<Scalars['String']['output']>;
+  photo?: Maybe<ImageFieldOutput>;
+  position?: Maybe<Scalars['String']['output']>;
+  province?: Maybe<Scalars['String']['output']>;
+  skill?: Maybe<Scalars['String']['output']>;
+};
+
+export type BeProPlayerCreateInput = {
+  ability?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  kitSize?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<Scalars['String']['input']>;
+  paid?: InputMaybe<Scalars['Boolean']['input']>;
+  phoneNumber?: InputMaybe<Scalars['String']['input']>;
+  photo?: InputMaybe<ImageFieldInput>;
+  position?: InputMaybe<Scalars['String']['input']>;
+  province?: InputMaybe<Scalars['String']['input']>;
+  skill?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type BeProPlayerOrderByInput = {
+  ability?: InputMaybe<OrderDirection>;
+  createdAt?: InputMaybe<OrderDirection>;
+  email?: InputMaybe<OrderDirection>;
+  firstName?: InputMaybe<OrderDirection>;
+  id?: InputMaybe<OrderDirection>;
+  kitSize?: InputMaybe<OrderDirection>;
+  lastName?: InputMaybe<OrderDirection>;
+  location?: InputMaybe<OrderDirection>;
+  paid?: InputMaybe<OrderDirection>;
+  phoneNumber?: InputMaybe<OrderDirection>;
+  position?: InputMaybe<OrderDirection>;
+  province?: InputMaybe<OrderDirection>;
+  skill?: InputMaybe<OrderDirection>;
+};
+
+export type BeProPlayerUpdateArgs = {
+  data: BeProPlayerUpdateInput;
+  where: BeProPlayerWhereUniqueInput;
+};
+
+export type BeProPlayerUpdateInput = {
+  ability?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  kitSize?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<Scalars['String']['input']>;
+  paid?: InputMaybe<Scalars['Boolean']['input']>;
+  phoneNumber?: InputMaybe<Scalars['String']['input']>;
+  photo?: InputMaybe<ImageFieldInput>;
+  position?: InputMaybe<Scalars['String']['input']>;
+  province?: InputMaybe<Scalars['String']['input']>;
+  skill?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type BeProPlayerWhereInput = {
+  AND?: InputMaybe<Array<BeProPlayerWhereInput>>;
+  NOT?: InputMaybe<Array<BeProPlayerWhereInput>>;
+  OR?: InputMaybe<Array<BeProPlayerWhereInput>>;
+  ability?: InputMaybe<StringNullableFilter>;
+  createdAt?: InputMaybe<DateTimeNullableFilter>;
+  email?: InputMaybe<StringFilter>;
+  firstName?: InputMaybe<StringFilter>;
+  id?: InputMaybe<IdFilter>;
+  kitSize?: InputMaybe<StringNullableFilter>;
+  lastName?: InputMaybe<StringFilter>;
+  location?: InputMaybe<StringFilter>;
+  paid?: InputMaybe<BooleanFilter>;
+  phoneNumber?: InputMaybe<StringFilter>;
+  position?: InputMaybe<StringNullableFilter>;
+  province?: InputMaybe<StringNullableFilter>;
+  skill?: InputMaybe<StringNullableFilter>;
+};
+
+export type BeProPlayerWhereUniqueInput = {
+  email?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  phoneNumber?: InputMaybe<Scalars['String']['input']>;
+};
 
 export type BooleanFilter = {
   equals?: InputMaybe<Scalars['Boolean']['input']>;
   not?: InputMaybe<BooleanFilter>;
+};
+
+export type Community = {
+  __typename?: 'Community';
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  isActive?: Maybe<Scalars['Boolean']['output']>;
+  leaderboards?: Maybe<Array<Leaderboard>>;
+  leaderboardsCount?: Maybe<Scalars['Int']['output']>;
+  memberships?: Maybe<Array<CommunityMembership>>;
+  membershipsCount?: Maybe<Scalars['Int']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  seasons?: Maybe<Array<Season>>;
+  seasonsCount?: Maybe<Scalars['Int']['output']>;
+};
+
+
+export type CommunityLeaderboardsArgs = {
+  cursor?: InputMaybe<LeaderboardWhereUniqueInput>;
+  orderBy?: Array<LeaderboardOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: LeaderboardWhereInput;
+};
+
+
+export type CommunityLeaderboardsCountArgs = {
+  where?: LeaderboardWhereInput;
+};
+
+
+export type CommunityMembershipsArgs = {
+  cursor?: InputMaybe<CommunityMembershipWhereUniqueInput>;
+  orderBy?: Array<CommunityMembershipOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: CommunityMembershipWhereInput;
+};
+
+
+export type CommunityMembershipsCountArgs = {
+  where?: CommunityMembershipWhereInput;
+};
+
+
+export type CommunitySeasonsArgs = {
+  cursor?: InputMaybe<SeasonWhereUniqueInput>;
+  orderBy?: Array<SeasonOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: SeasonWhereInput;
+};
+
+
+export type CommunitySeasonsCountArgs = {
+  where?: SeasonWhereInput;
+};
+
+export type CommunityCreateInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  leaderboards?: InputMaybe<LeaderboardRelateToManyForCreateInput>;
+  memberships?: InputMaybe<CommunityMembershipRelateToManyForCreateInput>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  seasons?: InputMaybe<SeasonRelateToManyForCreateInput>;
+};
+
+export type CommunityMembership = {
+  __typename?: 'CommunityMembership';
+  community?: Maybe<Community>;
+  id: Scalars['ID']['output'];
+  isActive?: Maybe<Scalars['Boolean']['output']>;
+  joinedAt?: Maybe<Scalars['DateTime']['output']>;
+  role?: Maybe<Scalars['String']['output']>;
+  user?: Maybe<User>;
+};
+
+export type CommunityMembershipCreateInput = {
+  community?: InputMaybe<CommunityRelateToOneForCreateInput>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  joinedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  role?: InputMaybe<Scalars['String']['input']>;
+  user?: InputMaybe<UserRelateToOneForCreateInput>;
+};
+
+export type CommunityMembershipManyRelationFilter = {
+  every?: InputMaybe<CommunityMembershipWhereInput>;
+  none?: InputMaybe<CommunityMembershipWhereInput>;
+  some?: InputMaybe<CommunityMembershipWhereInput>;
+};
+
+export type CommunityMembershipOrderByInput = {
+  id?: InputMaybe<OrderDirection>;
+  isActive?: InputMaybe<OrderDirection>;
+  joinedAt?: InputMaybe<OrderDirection>;
+  role?: InputMaybe<OrderDirection>;
+};
+
+export type CommunityMembershipRelateToManyForCreateInput = {
+  connect?: InputMaybe<Array<CommunityMembershipWhereUniqueInput>>;
+  create?: InputMaybe<Array<CommunityMembershipCreateInput>>;
+};
+
+export type CommunityMembershipRelateToManyForUpdateInput = {
+  connect?: InputMaybe<Array<CommunityMembershipWhereUniqueInput>>;
+  create?: InputMaybe<Array<CommunityMembershipCreateInput>>;
+  disconnect?: InputMaybe<Array<CommunityMembershipWhereUniqueInput>>;
+  set?: InputMaybe<Array<CommunityMembershipWhereUniqueInput>>;
+};
+
+export type CommunityMembershipUpdateArgs = {
+  data: CommunityMembershipUpdateInput;
+  where: CommunityMembershipWhereUniqueInput;
+};
+
+export type CommunityMembershipUpdateInput = {
+  community?: InputMaybe<CommunityRelateToOneForUpdateInput>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  joinedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  role?: InputMaybe<Scalars['String']['input']>;
+  user?: InputMaybe<UserRelateToOneForUpdateInput>;
+};
+
+export type CommunityMembershipWhereInput = {
+  AND?: InputMaybe<Array<CommunityMembershipWhereInput>>;
+  NOT?: InputMaybe<Array<CommunityMembershipWhereInput>>;
+  OR?: InputMaybe<Array<CommunityMembershipWhereInput>>;
+  community?: InputMaybe<CommunityWhereInput>;
+  id?: InputMaybe<IdFilter>;
+  isActive?: InputMaybe<BooleanFilter>;
+  joinedAt?: InputMaybe<DateTimeNullableFilter>;
+  role?: InputMaybe<StringNullableFilter>;
+  user?: InputMaybe<UserWhereInput>;
+};
+
+export type CommunityMembershipWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type CommunityOrderByInput = {
+  createdAt?: InputMaybe<OrderDirection>;
+  description?: InputMaybe<OrderDirection>;
+  id?: InputMaybe<OrderDirection>;
+  isActive?: InputMaybe<OrderDirection>;
+  name?: InputMaybe<OrderDirection>;
+};
+
+export type CommunityRelateToOneForCreateInput = {
+  connect?: InputMaybe<CommunityWhereUniqueInput>;
+  create?: InputMaybe<CommunityCreateInput>;
+};
+
+export type CommunityRelateToOneForUpdateInput = {
+  connect?: InputMaybe<CommunityWhereUniqueInput>;
+  create?: InputMaybe<CommunityCreateInput>;
+  disconnect?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type CommunityUpdateArgs = {
+  data: CommunityUpdateInput;
+  where: CommunityWhereUniqueInput;
+};
+
+export type CommunityUpdateInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  leaderboards?: InputMaybe<LeaderboardRelateToManyForUpdateInput>;
+  memberships?: InputMaybe<CommunityMembershipRelateToManyForUpdateInput>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  seasons?: InputMaybe<SeasonRelateToManyForUpdateInput>;
+};
+
+export type CommunityWhereInput = {
+  AND?: InputMaybe<Array<CommunityWhereInput>>;
+  NOT?: InputMaybe<Array<CommunityWhereInput>>;
+  OR?: InputMaybe<Array<CommunityWhereInput>>;
+  createdAt?: InputMaybe<DateTimeNullableFilter>;
+  description?: InputMaybe<StringFilter>;
+  id?: InputMaybe<IdFilter>;
+  isActive?: InputMaybe<BooleanFilter>;
+  leaderboards?: InputMaybe<LeaderboardManyRelationFilter>;
+  memberships?: InputMaybe<CommunityMembershipManyRelationFilter>;
+  name?: InputMaybe<StringFilter>;
+  seasons?: InputMaybe<SeasonManyRelationFilter>;
+};
+
+export type CommunityWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type Competition = {
@@ -198,6 +764,88 @@ export type CreateInitialUserInput = {
   email?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type DashAdmin = {
+  __typename?: 'DashAdmin';
+  email?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+  password?: Maybe<PasswordState>;
+  role?: Maybe<Array<Role>>;
+  roleCount?: Maybe<Scalars['Int']['output']>;
+};
+
+
+export type DashAdminRoleArgs = {
+  cursor?: InputMaybe<RoleWhereUniqueInput>;
+  orderBy?: Array<RoleOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: RoleWhereInput;
+};
+
+
+export type DashAdminRoleCountArgs = {
+  where?: RoleWhereInput;
+};
+
+export type DashAdminCreateInput = {
+  email?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
+  role?: InputMaybe<RoleRelateToManyForCreateInput>;
+};
+
+export type DashAdminManyRelationFilter = {
+  every?: InputMaybe<DashAdminWhereInput>;
+  none?: InputMaybe<DashAdminWhereInput>;
+  some?: InputMaybe<DashAdminWhereInput>;
+};
+
+export type DashAdminOrderByInput = {
+  email?: InputMaybe<OrderDirection>;
+  id?: InputMaybe<OrderDirection>;
+  name?: InputMaybe<OrderDirection>;
+};
+
+export type DashAdminRelateToManyForCreateInput = {
+  connect?: InputMaybe<Array<DashAdminWhereUniqueInput>>;
+  create?: InputMaybe<Array<DashAdminCreateInput>>;
+};
+
+export type DashAdminRelateToManyForUpdateInput = {
+  connect?: InputMaybe<Array<DashAdminWhereUniqueInput>>;
+  create?: InputMaybe<Array<DashAdminCreateInput>>;
+  disconnect?: InputMaybe<Array<DashAdminWhereUniqueInput>>;
+  set?: InputMaybe<Array<DashAdminWhereUniqueInput>>;
+};
+
+export type DashAdminUpdateArgs = {
+  data: DashAdminUpdateInput;
+  where: DashAdminWhereUniqueInput;
+};
+
+export type DashAdminUpdateInput = {
+  email?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  password?: InputMaybe<Scalars['String']['input']>;
+  role?: InputMaybe<RoleRelateToManyForUpdateInput>;
+};
+
+export type DashAdminWhereInput = {
+  AND?: InputMaybe<Array<DashAdminWhereInput>>;
+  NOT?: InputMaybe<Array<DashAdminWhereInput>>;
+  OR?: InputMaybe<Array<DashAdminWhereInput>>;
+  email?: InputMaybe<StringFilter>;
+  id?: InputMaybe<IdFilter>;
+  name?: InputMaybe<StringFilter>;
+  role?: InputMaybe<RoleManyRelationFilter>;
+};
+
+export type DashAdminWhereUniqueInput = {
+  email?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type DateTimeFilter = {
@@ -714,6 +1362,180 @@ export type KeystoneMeta = {
   adminMeta: KeystoneAdminMeta;
 };
 
+export type Leaderboard = {
+  __typename?: 'Leaderboard';
+  community?: Maybe<Community>;
+  description?: Maybe<Scalars['String']['output']>;
+  entries?: Maybe<Array<LeaderboardEntry>>;
+  entriesCount?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['ID']['output'];
+  isActive?: Maybe<Scalars['Boolean']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  season?: Maybe<Season>;
+};
+
+
+export type LeaderboardEntriesArgs = {
+  cursor?: InputMaybe<LeaderboardEntryWhereUniqueInput>;
+  orderBy?: Array<LeaderboardEntryOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: LeaderboardEntryWhereInput;
+};
+
+
+export type LeaderboardEntriesCountArgs = {
+  where?: LeaderboardEntryWhereInput;
+};
+
+export type LeaderboardCreateInput = {
+  community?: InputMaybe<CommunityRelateToOneForCreateInput>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  entries?: InputMaybe<LeaderboardEntryRelateToManyForCreateInput>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  season?: InputMaybe<SeasonRelateToOneForCreateInput>;
+};
+
+export type LeaderboardEntry = {
+  __typename?: 'LeaderboardEntry';
+  id: Scalars['ID']['output'];
+  leaderboard?: Maybe<Leaderboard>;
+  rank?: Maybe<Scalars['Int']['output']>;
+  score?: Maybe<Scalars['Int']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  user?: Maybe<User>;
+};
+
+export type LeaderboardEntryCreateInput = {
+  leaderboard?: InputMaybe<LeaderboardRelateToOneForCreateInput>;
+  rank?: InputMaybe<Scalars['Int']['input']>;
+  score?: InputMaybe<Scalars['Int']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  user?: InputMaybe<UserRelateToOneForCreateInput>;
+};
+
+export type LeaderboardEntryManyRelationFilter = {
+  every?: InputMaybe<LeaderboardEntryWhereInput>;
+  none?: InputMaybe<LeaderboardEntryWhereInput>;
+  some?: InputMaybe<LeaderboardEntryWhereInput>;
+};
+
+export type LeaderboardEntryOrderByInput = {
+  id?: InputMaybe<OrderDirection>;
+  rank?: InputMaybe<OrderDirection>;
+  score?: InputMaybe<OrderDirection>;
+  updatedAt?: InputMaybe<OrderDirection>;
+};
+
+export type LeaderboardEntryRelateToManyForCreateInput = {
+  connect?: InputMaybe<Array<LeaderboardEntryWhereUniqueInput>>;
+  create?: InputMaybe<Array<LeaderboardEntryCreateInput>>;
+};
+
+export type LeaderboardEntryRelateToManyForUpdateInput = {
+  connect?: InputMaybe<Array<LeaderboardEntryWhereUniqueInput>>;
+  create?: InputMaybe<Array<LeaderboardEntryCreateInput>>;
+  disconnect?: InputMaybe<Array<LeaderboardEntryWhereUniqueInput>>;
+  set?: InputMaybe<Array<LeaderboardEntryWhereUniqueInput>>;
+};
+
+export type LeaderboardEntryUpdateArgs = {
+  data: LeaderboardEntryUpdateInput;
+  where: LeaderboardEntryWhereUniqueInput;
+};
+
+export type LeaderboardEntryUpdateInput = {
+  leaderboard?: InputMaybe<LeaderboardRelateToOneForUpdateInput>;
+  rank?: InputMaybe<Scalars['Int']['input']>;
+  score?: InputMaybe<Scalars['Int']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  user?: InputMaybe<UserRelateToOneForUpdateInput>;
+};
+
+export type LeaderboardEntryWhereInput = {
+  AND?: InputMaybe<Array<LeaderboardEntryWhereInput>>;
+  NOT?: InputMaybe<Array<LeaderboardEntryWhereInput>>;
+  OR?: InputMaybe<Array<LeaderboardEntryWhereInput>>;
+  id?: InputMaybe<IdFilter>;
+  leaderboard?: InputMaybe<LeaderboardWhereInput>;
+  rank?: InputMaybe<IntFilter>;
+  score?: InputMaybe<IntNullableFilter>;
+  updatedAt?: InputMaybe<DateTimeNullableFilter>;
+  user?: InputMaybe<UserWhereInput>;
+};
+
+export type LeaderboardEntryWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type LeaderboardManyRelationFilter = {
+  every?: InputMaybe<LeaderboardWhereInput>;
+  none?: InputMaybe<LeaderboardWhereInput>;
+  some?: InputMaybe<LeaderboardWhereInput>;
+};
+
+export type LeaderboardOrderByInput = {
+  description?: InputMaybe<OrderDirection>;
+  id?: InputMaybe<OrderDirection>;
+  isActive?: InputMaybe<OrderDirection>;
+  name?: InputMaybe<OrderDirection>;
+};
+
+export type LeaderboardRelateToManyForCreateInput = {
+  connect?: InputMaybe<Array<LeaderboardWhereUniqueInput>>;
+  create?: InputMaybe<Array<LeaderboardCreateInput>>;
+};
+
+export type LeaderboardRelateToManyForUpdateInput = {
+  connect?: InputMaybe<Array<LeaderboardWhereUniqueInput>>;
+  create?: InputMaybe<Array<LeaderboardCreateInput>>;
+  disconnect?: InputMaybe<Array<LeaderboardWhereUniqueInput>>;
+  set?: InputMaybe<Array<LeaderboardWhereUniqueInput>>;
+};
+
+export type LeaderboardRelateToOneForCreateInput = {
+  connect?: InputMaybe<LeaderboardWhereUniqueInput>;
+  create?: InputMaybe<LeaderboardCreateInput>;
+};
+
+export type LeaderboardRelateToOneForUpdateInput = {
+  connect?: InputMaybe<LeaderboardWhereUniqueInput>;
+  create?: InputMaybe<LeaderboardCreateInput>;
+  disconnect?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type LeaderboardUpdateArgs = {
+  data: LeaderboardUpdateInput;
+  where: LeaderboardWhereUniqueInput;
+};
+
+export type LeaderboardUpdateInput = {
+  community?: InputMaybe<CommunityRelateToOneForUpdateInput>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  entries?: InputMaybe<LeaderboardEntryRelateToManyForUpdateInput>;
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  season?: InputMaybe<SeasonRelateToOneForUpdateInput>;
+};
+
+export type LeaderboardWhereInput = {
+  AND?: InputMaybe<Array<LeaderboardWhereInput>>;
+  NOT?: InputMaybe<Array<LeaderboardWhereInput>>;
+  OR?: InputMaybe<Array<LeaderboardWhereInput>>;
+  community?: InputMaybe<CommunityWhereInput>;
+  description?: InputMaybe<StringFilter>;
+  entries?: InputMaybe<LeaderboardEntryManyRelationFilter>;
+  id?: InputMaybe<IdFilter>;
+  isActive?: InputMaybe<BooleanFilter>;
+  name?: InputMaybe<StringFilter>;
+  season?: InputMaybe<SeasonWhereInput>;
+};
+
+export type LeaderboardWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
 export type Match = {
   __typename?: 'Match';
   actionDetails?: Maybe<Scalars['JSON']['output']>;
@@ -911,8 +1733,23 @@ export type Mutation = {
   authPlayerWithPassword?: Maybe<Player>;
   authenticateUserWithPassword?: Maybe<UserAuthenticationWithPasswordResult>;
   changePlayerPassword?: Maybe<Player>;
+  createArena?: Maybe<Arena>;
+  createArenaParticipant?: Maybe<ArenaParticipant>;
+  createArenaParticipants?: Maybe<Array<Maybe<ArenaParticipant>>>;
+  createArenas?: Maybe<Array<Maybe<Arena>>>;
+  createBadge?: Maybe<Badge>;
+  createBadges?: Maybe<Array<Maybe<Badge>>>;
+  createBeProPlayer?: Maybe<BeProPlayer>;
+  createBeProPlayers?: Maybe<Array<Maybe<BeProPlayer>>>;
+  createCommunities?: Maybe<Array<Maybe<Community>>>;
+  createCommunity?: Maybe<Community>;
+  createCommunityMembership?: Maybe<CommunityMembership>;
+  createCommunityMemberships?: Maybe<Array<Maybe<CommunityMembership>>>;
+  createCommunitySeasons?: Maybe<Array<Maybe<CommunitySeason>>>;
   createCompetition?: Maybe<Competition>;
   createCompetitions?: Maybe<Array<Maybe<Competition>>>;
+  createDashAdmin?: Maybe<DashAdmin>;
+  createDashAdmins?: Maybe<Array<Maybe<DashAdmin>>>;
   createDellCompetiton?: Maybe<DellCompetiton>;
   createDellCompetitons?: Maybe<Array<Maybe<DellCompetiton>>>;
   createHomePage?: Maybe<HomePage>;
@@ -922,6 +1759,10 @@ export type Mutation = {
   createInitialUser: UserAuthenticationWithPasswordSuccess;
   createInvite?: Maybe<Invite>;
   createInvites?: Maybe<Array<Maybe<Invite>>>;
+  createLeaderboard?: Maybe<Leaderboard>;
+  createLeaderboardEntries?: Maybe<Array<Maybe<LeaderboardEntry>>>;
+  createLeaderboardEntry?: Maybe<LeaderboardEntry>;
+  createLeaderboards?: Maybe<Array<Maybe<Leaderboard>>>;
   createLeagueCorrespondences?: Maybe<Array<Maybe<LeagueCorrespondence>>>;
   createLeagueInfos?: Maybe<Array<Maybe<LeagueInfo>>>;
   createLeagueTables?: Maybe<Array<Maybe<LeagueTable>>>;
@@ -929,6 +1770,8 @@ export type Mutation = {
   createMatches?: Maybe<Array<Maybe<Match>>>;
   createNew?: Maybe<New>;
   createNews?: Maybe<Array<Maybe<New>>>;
+  createPSC?: Maybe<Psc>;
+  createPSCS?: Maybe<Array<Maybe<Psc>>>;
   createParticipation?: Maybe<Participation>;
   createParticipations?: Maybe<Array<Maybe<Participation>>>;
   createPartner?: Maybe<Partner>;
@@ -948,14 +1791,34 @@ export type Mutation = {
   createTeam?: Maybe<Team>;
   createTeams?: Maybe<Array<Maybe<Team>>>;
   createUser?: Maybe<User>;
+  createUserBadge?: Maybe<UserBadge>;
+  createUserBadges?: Maybe<Array<Maybe<UserBadge>>>;
+  createUserMemberShips?: Maybe<Array<Maybe<UserMemberShip>>>;
   createUsers?: Maybe<Array<Maybe<User>>>;
   createZohoBooks?: Maybe<Array<Maybe<ZohoBook>>>;
+  createcommunitySeason?: Maybe<CommunitySeason>;
   createleagueCorrespondence?: Maybe<LeagueCorrespondence>;
   createleagueInfo?: Maybe<LeagueInfo>;
   createleagueTable?: Maybe<LeagueTable>;
+  createuserMemberShip?: Maybe<UserMemberShip>;
   createzohoBook?: Maybe<ZohoBook>;
+  deleteArena?: Maybe<Arena>;
+  deleteArenaParticipant?: Maybe<ArenaParticipant>;
+  deleteArenaParticipants?: Maybe<Array<Maybe<ArenaParticipant>>>;
+  deleteArenas?: Maybe<Array<Maybe<Arena>>>;
+  deleteBadge?: Maybe<Badge>;
+  deleteBadges?: Maybe<Array<Maybe<Badge>>>;
+  deleteBeProPlayer?: Maybe<BeProPlayer>;
+  deleteBeProPlayers?: Maybe<Array<Maybe<BeProPlayer>>>;
+  deleteCommunities?: Maybe<Array<Maybe<Community>>>;
+  deleteCommunity?: Maybe<Community>;
+  deleteCommunityMembership?: Maybe<CommunityMembership>;
+  deleteCommunityMemberships?: Maybe<Array<Maybe<CommunityMembership>>>;
+  deleteCommunitySeasons?: Maybe<Array<Maybe<CommunitySeason>>>;
   deleteCompetition?: Maybe<Competition>;
   deleteCompetitions?: Maybe<Array<Maybe<Competition>>>;
+  deleteDashAdmin?: Maybe<DashAdmin>;
+  deleteDashAdmins?: Maybe<Array<Maybe<DashAdmin>>>;
   deleteDellCompetiton?: Maybe<DellCompetiton>;
   deleteDellCompetitons?: Maybe<Array<Maybe<DellCompetiton>>>;
   deleteHomePage?: Maybe<HomePage>;
@@ -964,6 +1827,10 @@ export type Mutation = {
   deleteImages?: Maybe<Array<Maybe<Image>>>;
   deleteInvite?: Maybe<Invite>;
   deleteInvites?: Maybe<Array<Maybe<Invite>>>;
+  deleteLeaderboard?: Maybe<Leaderboard>;
+  deleteLeaderboardEntries?: Maybe<Array<Maybe<LeaderboardEntry>>>;
+  deleteLeaderboardEntry?: Maybe<LeaderboardEntry>;
+  deleteLeaderboards?: Maybe<Array<Maybe<Leaderboard>>>;
   deleteLeagueCorrespondences?: Maybe<Array<Maybe<LeagueCorrespondence>>>;
   deleteLeagueInfos?: Maybe<Array<Maybe<LeagueInfo>>>;
   deleteLeagueTables?: Maybe<Array<Maybe<LeagueTable>>>;
@@ -971,6 +1838,8 @@ export type Mutation = {
   deleteMatches?: Maybe<Array<Maybe<Match>>>;
   deleteNew?: Maybe<New>;
   deleteNews?: Maybe<Array<Maybe<New>>>;
+  deletePSC?: Maybe<Psc>;
+  deletePSCS?: Maybe<Array<Maybe<Psc>>>;
   deleteParticipation?: Maybe<Participation>;
   deleteParticipations?: Maybe<Array<Maybe<Participation>>>;
   deletePartner?: Maybe<Partner>;
@@ -990,18 +1859,38 @@ export type Mutation = {
   deleteTeam?: Maybe<Team>;
   deleteTeams?: Maybe<Array<Maybe<Team>>>;
   deleteUser?: Maybe<User>;
+  deleteUserBadge?: Maybe<UserBadge>;
+  deleteUserBadges?: Maybe<Array<Maybe<UserBadge>>>;
+  deleteUserMemberShips?: Maybe<Array<Maybe<UserMemberShip>>>;
   deleteUsers?: Maybe<Array<Maybe<User>>>;
   deleteZohoBooks?: Maybe<Array<Maybe<ZohoBook>>>;
+  deletecommunitySeason?: Maybe<CommunitySeason>;
   deleteleagueCorrespondence?: Maybe<LeagueCorrespondence>;
   deleteleagueInfo?: Maybe<LeagueInfo>;
   deleteleagueTable?: Maybe<LeagueTable>;
+  deleteuserMemberShip?: Maybe<UserMemberShip>;
   deletezohoBook?: Maybe<ZohoBook>;
   endSession: Scalars['Boolean']['output'];
   forgetPlayerPassword?: Maybe<Player>;
   requestPlayer?: Maybe<Player>;
   sendEmailToPlayer?: Maybe<Player>;
+  updateArena?: Maybe<Arena>;
+  updateArenaParticipant?: Maybe<ArenaParticipant>;
+  updateArenaParticipants?: Maybe<Array<Maybe<ArenaParticipant>>>;
+  updateArenas?: Maybe<Array<Maybe<Arena>>>;
+  updateBadge?: Maybe<Badge>;
+  updateBadges?: Maybe<Array<Maybe<Badge>>>;
+  updateBeProPlayer?: Maybe<BeProPlayer>;
+  updateBeProPlayers?: Maybe<Array<Maybe<BeProPlayer>>>;
+  updateCommunities?: Maybe<Array<Maybe<Community>>>;
+  updateCommunity?: Maybe<Community>;
+  updateCommunityMembership?: Maybe<CommunityMembership>;
+  updateCommunityMemberships?: Maybe<Array<Maybe<CommunityMembership>>>;
+  updateCommunitySeasons?: Maybe<Array<Maybe<CommunitySeason>>>;
   updateCompetition?: Maybe<Competition>;
   updateCompetitions?: Maybe<Array<Maybe<Competition>>>;
+  updateDashAdmin?: Maybe<DashAdmin>;
+  updateDashAdmins?: Maybe<Array<Maybe<DashAdmin>>>;
   updateDellCompetiton?: Maybe<DellCompetiton>;
   updateDellCompetitons?: Maybe<Array<Maybe<DellCompetiton>>>;
   updateHomePage?: Maybe<HomePage>;
@@ -1010,6 +1899,10 @@ export type Mutation = {
   updateImages?: Maybe<Array<Maybe<Image>>>;
   updateInvite?: Maybe<Invite>;
   updateInvites?: Maybe<Array<Maybe<Invite>>>;
+  updateLeaderboard?: Maybe<Leaderboard>;
+  updateLeaderboardEntries?: Maybe<Array<Maybe<LeaderboardEntry>>>;
+  updateLeaderboardEntry?: Maybe<LeaderboardEntry>;
+  updateLeaderboards?: Maybe<Array<Maybe<Leaderboard>>>;
   updateLeagueCorrespondences?: Maybe<Array<Maybe<LeagueCorrespondence>>>;
   updateLeagueInfos?: Maybe<Array<Maybe<LeagueInfo>>>;
   updateLeagueTables?: Maybe<Array<Maybe<LeagueTable>>>;
@@ -1017,6 +1910,8 @@ export type Mutation = {
   updateMatches?: Maybe<Array<Maybe<Match>>>;
   updateNew?: Maybe<New>;
   updateNews?: Maybe<Array<Maybe<New>>>;
+  updatePSC?: Maybe<Psc>;
+  updatePSCS?: Maybe<Array<Maybe<Psc>>>;
   updateParticipation?: Maybe<Participation>;
   updateParticipations?: Maybe<Array<Maybe<Participation>>>;
   updatePartner?: Maybe<Partner>;
@@ -1036,11 +1931,16 @@ export type Mutation = {
   updateTeam?: Maybe<Team>;
   updateTeams?: Maybe<Array<Maybe<Team>>>;
   updateUser?: Maybe<User>;
+  updateUserBadge?: Maybe<UserBadge>;
+  updateUserBadges?: Maybe<Array<Maybe<UserBadge>>>;
+  updateUserMemberShips?: Maybe<Array<Maybe<UserMemberShip>>>;
   updateUsers?: Maybe<Array<Maybe<User>>>;
   updateZohoBooks?: Maybe<Array<Maybe<ZohoBook>>>;
+  updatecommunitySeason?: Maybe<CommunitySeason>;
   updateleagueCorrespondence?: Maybe<LeagueCorrespondence>;
   updateleagueInfo?: Maybe<LeagueInfo>;
   updateleagueTable?: Maybe<LeagueTable>;
+  updateuserMemberShip?: Maybe<UserMemberShip>;
   updatezohoBook?: Maybe<ZohoBook>;
 };
 
@@ -1064,6 +1964,71 @@ export type MutationChangePlayerPasswordArgs = {
 };
 
 
+export type MutationCreateArenaArgs = {
+  data: ArenaCreateInput;
+};
+
+
+export type MutationCreateArenaParticipantArgs = {
+  data: ArenaParticipantCreateInput;
+};
+
+
+export type MutationCreateArenaParticipantsArgs = {
+  data: Array<ArenaParticipantCreateInput>;
+};
+
+
+export type MutationCreateArenasArgs = {
+  data: Array<ArenaCreateInput>;
+};
+
+
+export type MutationCreateBadgeArgs = {
+  data: BadgeCreateInput;
+};
+
+
+export type MutationCreateBadgesArgs = {
+  data: Array<BadgeCreateInput>;
+};
+
+
+export type MutationCreateBeProPlayerArgs = {
+  data: BeProPlayerCreateInput;
+};
+
+
+export type MutationCreateBeProPlayersArgs = {
+  data: Array<BeProPlayerCreateInput>;
+};
+
+
+export type MutationCreateCommunitiesArgs = {
+  data: Array<CommunityCreateInput>;
+};
+
+
+export type MutationCreateCommunityArgs = {
+  data: CommunityCreateInput;
+};
+
+
+export type MutationCreateCommunityMembershipArgs = {
+  data: CommunityMembershipCreateInput;
+};
+
+
+export type MutationCreateCommunityMembershipsArgs = {
+  data: Array<CommunityMembershipCreateInput>;
+};
+
+
+export type MutationCreateCommunitySeasonsArgs = {
+  data: Array<CommunitySeasonCreateInput>;
+};
+
+
 export type MutationCreateCompetitionArgs = {
   data: CompetitionCreateInput;
 };
@@ -1071,6 +2036,16 @@ export type MutationCreateCompetitionArgs = {
 
 export type MutationCreateCompetitionsArgs = {
   data: Array<CompetitionCreateInput>;
+};
+
+
+export type MutationCreateDashAdminArgs = {
+  data: DashAdminCreateInput;
+};
+
+
+export type MutationCreateDashAdminsArgs = {
+  data: Array<DashAdminCreateInput>;
 };
 
 
@@ -1119,6 +2094,26 @@ export type MutationCreateInvitesArgs = {
 };
 
 
+export type MutationCreateLeaderboardArgs = {
+  data: LeaderboardCreateInput;
+};
+
+
+export type MutationCreateLeaderboardEntriesArgs = {
+  data: Array<LeaderboardEntryCreateInput>;
+};
+
+
+export type MutationCreateLeaderboardEntryArgs = {
+  data: LeaderboardEntryCreateInput;
+};
+
+
+export type MutationCreateLeaderboardsArgs = {
+  data: Array<LeaderboardCreateInput>;
+};
+
+
 export type MutationCreateLeagueCorrespondencesArgs = {
   data: Array<LeagueCorrespondenceCreateInput>;
 };
@@ -1151,6 +2146,16 @@ export type MutationCreateNewArgs = {
 
 export type MutationCreateNewsArgs = {
   data: Array<NewCreateInput>;
+};
+
+
+export type MutationCreatePscArgs = {
+  data: PscCreateInput;
+};
+
+
+export type MutationCreatePscsArgs = {
+  data: Array<PscCreateInput>;
 };
 
 
@@ -1249,6 +2254,21 @@ export type MutationCreateUserArgs = {
 };
 
 
+export type MutationCreateUserBadgeArgs = {
+  data: UserBadgeCreateInput;
+};
+
+
+export type MutationCreateUserBadgesArgs = {
+  data: Array<UserBadgeCreateInput>;
+};
+
+
+export type MutationCreateUserMemberShipsArgs = {
+  data: Array<UserMemberShipCreateInput>;
+};
+
+
 export type MutationCreateUsersArgs = {
   data: Array<UserCreateInput>;
 };
@@ -1256,6 +2276,11 @@ export type MutationCreateUsersArgs = {
 
 export type MutationCreateZohoBooksArgs = {
   data: Array<ZohoBookCreateInput>;
+};
+
+
+export type MutationCreatecommunitySeasonArgs = {
+  data: CommunitySeasonCreateInput;
 };
 
 
@@ -1274,8 +2299,78 @@ export type MutationCreateleagueTableArgs = {
 };
 
 
+export type MutationCreateuserMemberShipArgs = {
+  data: UserMemberShipCreateInput;
+};
+
+
 export type MutationCreatezohoBookArgs = {
   data: ZohoBookCreateInput;
+};
+
+
+export type MutationDeleteArenaArgs = {
+  where: ArenaWhereUniqueInput;
+};
+
+
+export type MutationDeleteArenaParticipantArgs = {
+  where: ArenaParticipantWhereUniqueInput;
+};
+
+
+export type MutationDeleteArenaParticipantsArgs = {
+  where: Array<ArenaParticipantWhereUniqueInput>;
+};
+
+
+export type MutationDeleteArenasArgs = {
+  where: Array<ArenaWhereUniqueInput>;
+};
+
+
+export type MutationDeleteBadgeArgs = {
+  where: BadgeWhereUniqueInput;
+};
+
+
+export type MutationDeleteBadgesArgs = {
+  where: Array<BadgeWhereUniqueInput>;
+};
+
+
+export type MutationDeleteBeProPlayerArgs = {
+  where: BeProPlayerWhereUniqueInput;
+};
+
+
+export type MutationDeleteBeProPlayersArgs = {
+  where: Array<BeProPlayerWhereUniqueInput>;
+};
+
+
+export type MutationDeleteCommunitiesArgs = {
+  where: Array<CommunityWhereUniqueInput>;
+};
+
+
+export type MutationDeleteCommunityArgs = {
+  where: CommunityWhereUniqueInput;
+};
+
+
+export type MutationDeleteCommunityMembershipArgs = {
+  where: CommunityMembershipWhereUniqueInput;
+};
+
+
+export type MutationDeleteCommunityMembershipsArgs = {
+  where: Array<CommunityMembershipWhereUniqueInput>;
+};
+
+
+export type MutationDeleteCommunitySeasonsArgs = {
+  where: Array<CommunitySeasonWhereUniqueInput>;
 };
 
 
@@ -1286,6 +2381,16 @@ export type MutationDeleteCompetitionArgs = {
 
 export type MutationDeleteCompetitionsArgs = {
   where: Array<CompetitionWhereUniqueInput>;
+};
+
+
+export type MutationDeleteDashAdminArgs = {
+  where: DashAdminWhereUniqueInput;
+};
+
+
+export type MutationDeleteDashAdminsArgs = {
+  where: Array<DashAdminWhereUniqueInput>;
 };
 
 
@@ -1329,6 +2434,26 @@ export type MutationDeleteInvitesArgs = {
 };
 
 
+export type MutationDeleteLeaderboardArgs = {
+  where: LeaderboardWhereUniqueInput;
+};
+
+
+export type MutationDeleteLeaderboardEntriesArgs = {
+  where: Array<LeaderboardEntryWhereUniqueInput>;
+};
+
+
+export type MutationDeleteLeaderboardEntryArgs = {
+  where: LeaderboardEntryWhereUniqueInput;
+};
+
+
+export type MutationDeleteLeaderboardsArgs = {
+  where: Array<LeaderboardWhereUniqueInput>;
+};
+
+
 export type MutationDeleteLeagueCorrespondencesArgs = {
   where: Array<LeagueCorrespondenceWhereUniqueInput>;
 };
@@ -1361,6 +2486,16 @@ export type MutationDeleteNewArgs = {
 
 export type MutationDeleteNewsArgs = {
   where: Array<NewWhereUniqueInput>;
+};
+
+
+export type MutationDeletePscArgs = {
+  where: PscWhereUniqueInput;
+};
+
+
+export type MutationDeletePscsArgs = {
+  where: Array<PscWhereUniqueInput>;
 };
 
 
@@ -1459,6 +2594,21 @@ export type MutationDeleteUserArgs = {
 };
 
 
+export type MutationDeleteUserBadgeArgs = {
+  where: UserBadgeWhereUniqueInput;
+};
+
+
+export type MutationDeleteUserBadgesArgs = {
+  where: Array<UserBadgeWhereUniqueInput>;
+};
+
+
+export type MutationDeleteUserMemberShipsArgs = {
+  where: Array<UserMemberShipWhereUniqueInput>;
+};
+
+
 export type MutationDeleteUsersArgs = {
   where: Array<UserWhereUniqueInput>;
 };
@@ -1466,6 +2616,11 @@ export type MutationDeleteUsersArgs = {
 
 export type MutationDeleteZohoBooksArgs = {
   where: Array<ZohoBookWhereUniqueInput>;
+};
+
+
+export type MutationDeletecommunitySeasonArgs = {
+  where: CommunitySeasonWhereUniqueInput;
 };
 
 
@@ -1481,6 +2636,11 @@ export type MutationDeleteleagueInfoArgs = {
 
 export type MutationDeleteleagueTableArgs = {
   where: LeagueTableWhereUniqueInput;
+};
+
+
+export type MutationDeleteuserMemberShipArgs = {
+  where: UserMemberShipWhereUniqueInput;
 };
 
 
@@ -1506,6 +2666,77 @@ export type MutationSendEmailToPlayerArgs = {
 };
 
 
+export type MutationUpdateArenaArgs = {
+  data: ArenaUpdateInput;
+  where: ArenaWhereUniqueInput;
+};
+
+
+export type MutationUpdateArenaParticipantArgs = {
+  data: ArenaParticipantUpdateInput;
+  where: ArenaParticipantWhereUniqueInput;
+};
+
+
+export type MutationUpdateArenaParticipantsArgs = {
+  data: Array<ArenaParticipantUpdateArgs>;
+};
+
+
+export type MutationUpdateArenasArgs = {
+  data: Array<ArenaUpdateArgs>;
+};
+
+
+export type MutationUpdateBadgeArgs = {
+  data: BadgeUpdateInput;
+  where: BadgeWhereUniqueInput;
+};
+
+
+export type MutationUpdateBadgesArgs = {
+  data: Array<BadgeUpdateArgs>;
+};
+
+
+export type MutationUpdateBeProPlayerArgs = {
+  data: BeProPlayerUpdateInput;
+  where: BeProPlayerWhereUniqueInput;
+};
+
+
+export type MutationUpdateBeProPlayersArgs = {
+  data: Array<BeProPlayerUpdateArgs>;
+};
+
+
+export type MutationUpdateCommunitiesArgs = {
+  data: Array<CommunityUpdateArgs>;
+};
+
+
+export type MutationUpdateCommunityArgs = {
+  data: CommunityUpdateInput;
+  where: CommunityWhereUniqueInput;
+};
+
+
+export type MutationUpdateCommunityMembershipArgs = {
+  data: CommunityMembershipUpdateInput;
+  where: CommunityMembershipWhereUniqueInput;
+};
+
+
+export type MutationUpdateCommunityMembershipsArgs = {
+  data: Array<CommunityMembershipUpdateArgs>;
+};
+
+
+export type MutationUpdateCommunitySeasonsArgs = {
+  data: Array<CommunitySeasonUpdateArgs>;
+};
+
+
 export type MutationUpdateCompetitionArgs = {
   data: CompetitionUpdateInput;
   where: CompetitionWhereUniqueInput;
@@ -1514,6 +2745,17 @@ export type MutationUpdateCompetitionArgs = {
 
 export type MutationUpdateCompetitionsArgs = {
   data: Array<CompetitionUpdateArgs>;
+};
+
+
+export type MutationUpdateDashAdminArgs = {
+  data: DashAdminUpdateInput;
+  where: DashAdminWhereUniqueInput;
+};
+
+
+export type MutationUpdateDashAdminsArgs = {
+  data: Array<DashAdminUpdateArgs>;
 };
 
 
@@ -1561,6 +2803,28 @@ export type MutationUpdateInvitesArgs = {
 };
 
 
+export type MutationUpdateLeaderboardArgs = {
+  data: LeaderboardUpdateInput;
+  where: LeaderboardWhereUniqueInput;
+};
+
+
+export type MutationUpdateLeaderboardEntriesArgs = {
+  data: Array<LeaderboardEntryUpdateArgs>;
+};
+
+
+export type MutationUpdateLeaderboardEntryArgs = {
+  data: LeaderboardEntryUpdateInput;
+  where: LeaderboardEntryWhereUniqueInput;
+};
+
+
+export type MutationUpdateLeaderboardsArgs = {
+  data: Array<LeaderboardUpdateArgs>;
+};
+
+
 export type MutationUpdateLeagueCorrespondencesArgs = {
   data: Array<LeagueCorrespondenceUpdateArgs>;
 };
@@ -1595,6 +2859,17 @@ export type MutationUpdateNewArgs = {
 
 export type MutationUpdateNewsArgs = {
   data: Array<NewUpdateArgs>;
+};
+
+
+export type MutationUpdatePscArgs = {
+  data: PscUpdateInput;
+  where: PscWhereUniqueInput;
+};
+
+
+export type MutationUpdatePscsArgs = {
+  data: Array<PscUpdateArgs>;
 };
 
 
@@ -1703,6 +2978,22 @@ export type MutationUpdateUserArgs = {
 };
 
 
+export type MutationUpdateUserBadgeArgs = {
+  data: UserBadgeUpdateInput;
+  where: UserBadgeWhereUniqueInput;
+};
+
+
+export type MutationUpdateUserBadgesArgs = {
+  data: Array<UserBadgeUpdateArgs>;
+};
+
+
+export type MutationUpdateUserMemberShipsArgs = {
+  data: Array<UserMemberShipUpdateArgs>;
+};
+
+
 export type MutationUpdateUsersArgs = {
   data: Array<UserUpdateArgs>;
 };
@@ -1710,6 +3001,12 @@ export type MutationUpdateUsersArgs = {
 
 export type MutationUpdateZohoBooksArgs = {
   data: Array<ZohoBookUpdateArgs>;
+};
+
+
+export type MutationUpdatecommunitySeasonArgs = {
+  data: CommunitySeasonUpdateInput;
+  where: CommunitySeasonWhereUniqueInput;
 };
 
 
@@ -1728,6 +3025,12 @@ export type MutationUpdateleagueInfoArgs = {
 export type MutationUpdateleagueTableArgs = {
   data: LeagueTableUpdateInput;
   where: LeagueTableWhereUniqueInput;
+};
+
+
+export type MutationUpdateuserMemberShipArgs = {
+  data: UserMemberShipUpdateInput;
+  where: UserMemberShipWhereUniqueInput;
 };
 
 
@@ -1834,6 +3137,73 @@ export enum OrderDirection {
   Asc = 'asc',
   Desc = 'desc'
 }
+
+export type Psc = {
+  __typename?: 'PSC';
+  ageGroup?: Maybe<Scalars['String']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  teamCaptainEmail?: Maybe<Scalars['String']['output']>;
+  teamCaptainMobile?: Maybe<Scalars['String']['output']>;
+  teamCaptainName?: Maybe<Scalars['String']['output']>;
+  teamCount?: Maybe<Scalars['String']['output']>;
+  teamName?: Maybe<Scalars['String']['output']>;
+};
+
+export type PscCreateInput = {
+  ageGroup?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  teamCaptainEmail?: InputMaybe<Scalars['String']['input']>;
+  teamCaptainMobile?: InputMaybe<Scalars['String']['input']>;
+  teamCaptainName?: InputMaybe<Scalars['String']['input']>;
+  teamCount?: InputMaybe<Scalars['String']['input']>;
+  teamName?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PscOrderByInput = {
+  ageGroup?: InputMaybe<OrderDirection>;
+  createdAt?: InputMaybe<OrderDirection>;
+  id?: InputMaybe<OrderDirection>;
+  teamCaptainEmail?: InputMaybe<OrderDirection>;
+  teamCaptainMobile?: InputMaybe<OrderDirection>;
+  teamCaptainName?: InputMaybe<OrderDirection>;
+  teamCount?: InputMaybe<OrderDirection>;
+  teamName?: InputMaybe<OrderDirection>;
+};
+
+export type PscUpdateArgs = {
+  data: PscUpdateInput;
+  where: PscWhereUniqueInput;
+};
+
+export type PscUpdateInput = {
+  ageGroup?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  teamCaptainEmail?: InputMaybe<Scalars['String']['input']>;
+  teamCaptainMobile?: InputMaybe<Scalars['String']['input']>;
+  teamCaptainName?: InputMaybe<Scalars['String']['input']>;
+  teamCount?: InputMaybe<Scalars['String']['input']>;
+  teamName?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PscWhereInput = {
+  AND?: InputMaybe<Array<PscWhereInput>>;
+  NOT?: InputMaybe<Array<PscWhereInput>>;
+  OR?: InputMaybe<Array<PscWhereInput>>;
+  ageGroup?: InputMaybe<StringFilter>;
+  createdAt?: InputMaybe<DateTimeNullableFilter>;
+  id?: InputMaybe<IdFilter>;
+  teamCaptainEmail?: InputMaybe<StringFilter>;
+  teamCaptainMobile?: InputMaybe<StringFilter>;
+  teamCaptainName?: InputMaybe<StringFilter>;
+  teamCount?: InputMaybe<StringFilter>;
+  teamName?: InputMaybe<StringFilter>;
+};
+
+export type PscWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+  teamName?: InputMaybe<Scalars['String']['input']>;
+};
 
 export type Participation = {
   __typename?: 'Participation';
@@ -2059,10 +3429,12 @@ export type PasswordState = {
 export type Payment = {
   __typename?: 'Payment';
   amount?: Maybe<Scalars['String']['output']>;
+  checkPayment?: Maybe<Scalars['JSON']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   currency?: Maybe<Scalars['String']['output']>;
   discount?: Maybe<PaymentDiscount>;
   id: Scalars['ID']['output'];
+  intentionId?: Maybe<Scalars['String']['output']>;
   isFulfilled?: Maybe<Scalars['Boolean']['output']>;
   isInvoiceEmailed?: Maybe<Scalars['Boolean']['output']>;
   orderId?: Maybe<Scalars['String']['output']>;
@@ -2082,6 +3454,7 @@ export type PaymentCreateInput = {
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   currency?: InputMaybe<Scalars['String']['input']>;
   discount?: InputMaybe<PaymentDiscountRelateToOneForCreateInput>;
+  intentionId?: InputMaybe<Scalars['String']['input']>;
   isFulfilled?: InputMaybe<Scalars['Boolean']['input']>;
   isInvoiceEmailed?: InputMaybe<Scalars['Boolean']['input']>;
   orderId?: InputMaybe<Scalars['String']['input']>;
@@ -2187,11 +3560,18 @@ export type PaymentDiscountWhereUniqueInput = {
   id?: InputMaybe<Scalars['ID']['input']>;
 };
 
+export type PaymentManyRelationFilter = {
+  every?: InputMaybe<PaymentWhereInput>;
+  none?: InputMaybe<PaymentWhereInput>;
+  some?: InputMaybe<PaymentWhereInput>;
+};
+
 export type PaymentOrderByInput = {
   amount?: InputMaybe<OrderDirection>;
   createdAt?: InputMaybe<OrderDirection>;
   currency?: InputMaybe<OrderDirection>;
   id?: InputMaybe<OrderDirection>;
+  intentionId?: InputMaybe<OrderDirection>;
   isFulfilled?: InputMaybe<OrderDirection>;
   isInvoiceEmailed?: InputMaybe<OrderDirection>;
   orderId?: InputMaybe<OrderDirection>;
@@ -2331,6 +3711,18 @@ export type PaymentPlanWhereUniqueInput = {
   id?: InputMaybe<Scalars['ID']['input']>;
 };
 
+export type PaymentRelateToManyForCreateInput = {
+  connect?: InputMaybe<Array<PaymentWhereUniqueInput>>;
+  create?: InputMaybe<Array<PaymentCreateInput>>;
+};
+
+export type PaymentRelateToManyForUpdateInput = {
+  connect?: InputMaybe<Array<PaymentWhereUniqueInput>>;
+  create?: InputMaybe<Array<PaymentCreateInput>>;
+  disconnect?: InputMaybe<Array<PaymentWhereUniqueInput>>;
+  set?: InputMaybe<Array<PaymentWhereUniqueInput>>;
+};
+
 export type PaymentUpdateArgs = {
   data: PaymentUpdateInput;
   where: PaymentWhereUniqueInput;
@@ -2341,6 +3733,7 @@ export type PaymentUpdateInput = {
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   currency?: InputMaybe<Scalars['String']['input']>;
   discount?: InputMaybe<PaymentDiscountRelateToOneForUpdateInput>;
+  intentionId?: InputMaybe<Scalars['String']['input']>;
   isFulfilled?: InputMaybe<Scalars['Boolean']['input']>;
   isInvoiceEmailed?: InputMaybe<Scalars['Boolean']['input']>;
   orderId?: InputMaybe<Scalars['String']['input']>;
@@ -2364,6 +3757,7 @@ export type PaymentWhereInput = {
   currency?: InputMaybe<StringFilter>;
   discount?: InputMaybe<PaymentDiscountWhereInput>;
   id?: InputMaybe<IdFilter>;
+  intentionId?: InputMaybe<StringFilter>;
   isFulfilled?: InputMaybe<BooleanFilter>;
   isInvoiceEmailed?: InputMaybe<BooleanFilter>;
   orderId?: InputMaybe<StringFilter>;
@@ -2390,6 +3784,8 @@ export type Player = {
   assessment?: Maybe<Scalars['JSON']['output']>;
   bio?: Maybe<Scalars['String']['output']>;
   booksCustomerId?: Maybe<Scalars['String']['output']>;
+  competitions?: Maybe<Array<Competition>>;
+  competitionsCount?: Maybe<Scalars['Int']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   dateOfBirth?: Maybe<Scalars['String']['output']>;
   email?: Maybe<Scalars['String']['output']>;
@@ -2417,6 +3813,7 @@ export type Player = {
   playerID?: Maybe<Scalars['String']['output']>;
   position?: Maybe<Scalars['String']['output']>;
   preferredFoot?: Maybe<Scalars['String']['output']>;
+  receiveEmails?: Maybe<Scalars['Boolean']['output']>;
   secondPosition?: Maybe<Scalars['String']['output']>;
   sendEmail?: Maybe<Scalars['JSON']['output']>;
   setPassword?: Maybe<Scalars['JSON']['output']>;
@@ -2425,6 +3822,20 @@ export type Player = {
   verified?: Maybe<Scalars['Boolean']['output']>;
   weight?: Maybe<Scalars['Float']['output']>;
   work?: Maybe<Scalars['String']['output']>;
+};
+
+
+export type PlayerCompetitionsArgs = {
+  cursor?: InputMaybe<CompetitionWhereUniqueInput>;
+  orderBy?: Array<CompetitionOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: CompetitionWhereInput;
+};
+
+
+export type PlayerCompetitionsCountArgs = {
+  where?: CompetitionWhereInput;
 };
 
 
@@ -2447,6 +3858,7 @@ export type PlayerCreateInput = {
   assessment?: InputMaybe<Scalars['JSON']['input']>;
   bio?: InputMaybe<Scalars['String']['input']>;
   booksCustomerId?: InputMaybe<Scalars['String']['input']>;
+  competitions?: InputMaybe<CompetitionRelateToManyForCreateInput>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   dateOfBirth?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
@@ -2470,6 +3882,7 @@ export type PlayerCreateInput = {
   playerID?: InputMaybe<Scalars['String']['input']>;
   position?: InputMaybe<Scalars['String']['input']>;
   preferredFoot?: InputMaybe<Scalars['String']['input']>;
+  receiveEmails?: InputMaybe<Scalars['Boolean']['input']>;
   secondPosition?: InputMaybe<Scalars['String']['input']>;
   skill?: InputMaybe<Scalars['String']['input']>;
   suspended?: InputMaybe<Scalars['Boolean']['input']>;
@@ -2504,6 +3917,7 @@ export type PlayerOrderByInput = {
   playerID?: InputMaybe<OrderDirection>;
   position?: InputMaybe<OrderDirection>;
   preferredFoot?: InputMaybe<OrderDirection>;
+  receiveEmails?: InputMaybe<OrderDirection>;
   secondPosition?: InputMaybe<OrderDirection>;
   skill?: InputMaybe<OrderDirection>;
   suspended?: InputMaybe<OrderDirection>;
@@ -2534,6 +3948,7 @@ export type PlayerUpdateInput = {
   assessment?: InputMaybe<Scalars['JSON']['input']>;
   bio?: InputMaybe<Scalars['String']['input']>;
   booksCustomerId?: InputMaybe<Scalars['String']['input']>;
+  competitions?: InputMaybe<CompetitionRelateToManyForUpdateInput>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   dateOfBirth?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
@@ -2557,6 +3972,7 @@ export type PlayerUpdateInput = {
   playerID?: InputMaybe<Scalars['String']['input']>;
   position?: InputMaybe<Scalars['String']['input']>;
   preferredFoot?: InputMaybe<Scalars['String']['input']>;
+  receiveEmails?: InputMaybe<Scalars['Boolean']['input']>;
   secondPosition?: InputMaybe<Scalars['String']['input']>;
   skill?: InputMaybe<Scalars['String']['input']>;
   suspended?: InputMaybe<Scalars['Boolean']['input']>;
@@ -2573,6 +3989,7 @@ export type PlayerWhereInput = {
   age?: InputMaybe<IntNullableFilter>;
   bio?: InputMaybe<StringFilter>;
   booksCustomerId?: InputMaybe<StringFilter>;
+  competitions?: InputMaybe<CompetitionManyRelationFilter>;
   createdAt?: InputMaybe<DateTimeNullableFilter>;
   dateOfBirth?: InputMaybe<StringFilter>;
   email?: InputMaybe<StringFilter>;
@@ -2595,6 +4012,7 @@ export type PlayerWhereInput = {
   playerID?: InputMaybe<StringFilter>;
   position?: InputMaybe<StringNullableFilter>;
   preferredFoot?: InputMaybe<StringNullableFilter>;
+  receiveEmails?: InputMaybe<BooleanFilter>;
   secondPosition?: InputMaybe<StringNullableFilter>;
   skill?: InputMaybe<StringNullableFilter>;
   suspended?: InputMaybe<BooleanFilter>;
@@ -2611,10 +4029,34 @@ export type PlayerWhereUniqueInput = {
 
 export type Query = {
   __typename?: 'Query';
+  arena?: Maybe<Arena>;
+  arenaParticipant?: Maybe<ArenaParticipant>;
+  arenaParticipants?: Maybe<Array<ArenaParticipant>>;
+  arenaParticipantsCount?: Maybe<Scalars['Int']['output']>;
+  arenas?: Maybe<Array<Arena>>;
+  arenasCount?: Maybe<Scalars['Int']['output']>;
   authenticatedItem?: Maybe<AuthenticatedItem>;
+  badge?: Maybe<Badge>;
+  badges?: Maybe<Array<Badge>>;
+  badgesCount?: Maybe<Scalars['Int']['output']>;
+  beProPlayer?: Maybe<BeProPlayer>;
+  beProPlayers?: Maybe<Array<BeProPlayer>>;
+  beProPlayersCount?: Maybe<Scalars['Int']['output']>;
+  communities?: Maybe<Array<Community>>;
+  communitiesCount?: Maybe<Scalars['Int']['output']>;
+  community?: Maybe<Community>;
+  communityMembership?: Maybe<CommunityMembership>;
+  communityMemberships?: Maybe<Array<CommunityMembership>>;
+  communityMembershipsCount?: Maybe<Scalars['Int']['output']>;
+  communitySeason?: Maybe<CommunitySeason>;
+  communitySeasons?: Maybe<Array<CommunitySeason>>;
+  communitySeasonsCount?: Maybe<Scalars['Int']['output']>;
   competition?: Maybe<Competition>;
   competitions?: Maybe<Array<Competition>>;
   competitionsCount?: Maybe<Scalars['Int']['output']>;
+  dashAdmin?: Maybe<DashAdmin>;
+  dashAdmins?: Maybe<Array<DashAdmin>>;
+  dashAdminsCount?: Maybe<Scalars['Int']['output']>;
   dellCompetiton?: Maybe<DellCompetiton>;
   dellCompetitons?: Maybe<Array<DellCompetiton>>;
   dellCompetitonsCount?: Maybe<Scalars['Int']['output']>;
@@ -2628,6 +4070,12 @@ export type Query = {
   invites?: Maybe<Array<Invite>>;
   invitesCount?: Maybe<Scalars['Int']['output']>;
   keystone: KeystoneMeta;
+  leaderboard?: Maybe<Leaderboard>;
+  leaderboardEntries?: Maybe<Array<LeaderboardEntry>>;
+  leaderboardEntriesCount?: Maybe<Scalars['Int']['output']>;
+  leaderboardEntry?: Maybe<LeaderboardEntry>;
+  leaderboards?: Maybe<Array<Leaderboard>>;
+  leaderboardsCount?: Maybe<Scalars['Int']['output']>;
   leagueCorrespondence?: Maybe<LeagueCorrespondence>;
   leagueCorrespondences?: Maybe<Array<LeagueCorrespondence>>;
   leagueCorrespondencesCount?: Maybe<Scalars['Int']['output']>;
@@ -2643,6 +4091,9 @@ export type Query = {
   new?: Maybe<New>;
   news?: Maybe<Array<New>>;
   newsCount?: Maybe<Scalars['Int']['output']>;
+  pSC?: Maybe<Psc>;
+  pSCS?: Maybe<Array<Psc>>;
+  pSCSCount?: Maybe<Scalars['Int']['output']>;
   participation?: Maybe<Participation>;
   participations?: Maybe<Array<Participation>>;
   participationsCount?: Maybe<Scalars['Int']['output']>;
@@ -2671,11 +4122,150 @@ export type Query = {
   teams?: Maybe<Array<Team>>;
   teamsCount?: Maybe<Scalars['Int']['output']>;
   user?: Maybe<User>;
+  userBadge?: Maybe<UserBadge>;
+  userBadges?: Maybe<Array<UserBadge>>;
+  userBadgesCount?: Maybe<Scalars['Int']['output']>;
+  userMemberShip?: Maybe<UserMemberShip>;
+  userMemberShips?: Maybe<Array<UserMemberShip>>;
+  userMemberShipsCount?: Maybe<Scalars['Int']['output']>;
   users?: Maybe<Array<User>>;
   usersCount?: Maybe<Scalars['Int']['output']>;
   zohoBook?: Maybe<ZohoBook>;
   zohoBooks?: Maybe<Array<ZohoBook>>;
   zohoBooksCount?: Maybe<Scalars['Int']['output']>;
+};
+
+
+export type QueryArenaArgs = {
+  where: ArenaWhereUniqueInput;
+};
+
+
+export type QueryArenaParticipantArgs = {
+  where: ArenaParticipantWhereUniqueInput;
+};
+
+
+export type QueryArenaParticipantsArgs = {
+  cursor?: InputMaybe<ArenaParticipantWhereUniqueInput>;
+  orderBy?: Array<ArenaParticipantOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: ArenaParticipantWhereInput;
+};
+
+
+export type QueryArenaParticipantsCountArgs = {
+  where?: ArenaParticipantWhereInput;
+};
+
+
+export type QueryArenasArgs = {
+  cursor?: InputMaybe<ArenaWhereUniqueInput>;
+  orderBy?: Array<ArenaOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: ArenaWhereInput;
+};
+
+
+export type QueryArenasCountArgs = {
+  where?: ArenaWhereInput;
+};
+
+
+export type QueryBadgeArgs = {
+  where: BadgeWhereUniqueInput;
+};
+
+
+export type QueryBadgesArgs = {
+  cursor?: InputMaybe<BadgeWhereUniqueInput>;
+  orderBy?: Array<BadgeOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: BadgeWhereInput;
+};
+
+
+export type QueryBadgesCountArgs = {
+  where?: BadgeWhereInput;
+};
+
+
+export type QueryBeProPlayerArgs = {
+  where: BeProPlayerWhereUniqueInput;
+};
+
+
+export type QueryBeProPlayersArgs = {
+  cursor?: InputMaybe<BeProPlayerWhereUniqueInput>;
+  orderBy?: Array<BeProPlayerOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: BeProPlayerWhereInput;
+};
+
+
+export type QueryBeProPlayersCountArgs = {
+  where?: BeProPlayerWhereInput;
+};
+
+
+export type QueryCommunitiesArgs = {
+  cursor?: InputMaybe<CommunityWhereUniqueInput>;
+  orderBy?: Array<CommunityOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: CommunityWhereInput;
+};
+
+
+export type QueryCommunitiesCountArgs = {
+  where?: CommunityWhereInput;
+};
+
+
+export type QueryCommunityArgs = {
+  where: CommunityWhereUniqueInput;
+};
+
+
+export type QueryCommunityMembershipArgs = {
+  where: CommunityMembershipWhereUniqueInput;
+};
+
+
+export type QueryCommunityMembershipsArgs = {
+  cursor?: InputMaybe<CommunityMembershipWhereUniqueInput>;
+  orderBy?: Array<CommunityMembershipOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: CommunityMembershipWhereInput;
+};
+
+
+export type QueryCommunityMembershipsCountArgs = {
+  where?: CommunityMembershipWhereInput;
+};
+
+
+export type QueryCommunitySeasonArgs = {
+  where: CommunitySeasonWhereUniqueInput;
+};
+
+
+export type QueryCommunitySeasonsArgs = {
+  cursor?: InputMaybe<CommunitySeasonWhereUniqueInput>;
+  orderBy?: Array<CommunitySeasonOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: CommunitySeasonWhereInput;
+};
+
+
+export type QueryCommunitySeasonsCountArgs = {
+  where?: CommunitySeasonWhereInput;
 };
 
 
@@ -2695,6 +4285,25 @@ export type QueryCompetitionsArgs = {
 
 export type QueryCompetitionsCountArgs = {
   where?: CompetitionWhereInput;
+};
+
+
+export type QueryDashAdminArgs = {
+  where: DashAdminWhereUniqueInput;
+};
+
+
+export type QueryDashAdminsArgs = {
+  cursor?: InputMaybe<DashAdminWhereUniqueInput>;
+  orderBy?: Array<DashAdminOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: DashAdminWhereInput;
+};
+
+
+export type QueryDashAdminsCountArgs = {
+  where?: DashAdminWhereInput;
 };
 
 
@@ -2771,6 +4380,44 @@ export type QueryInvitesArgs = {
 
 export type QueryInvitesCountArgs = {
   where?: InviteWhereInput;
+};
+
+
+export type QueryLeaderboardArgs = {
+  where: LeaderboardWhereUniqueInput;
+};
+
+
+export type QueryLeaderboardEntriesArgs = {
+  cursor?: InputMaybe<LeaderboardEntryWhereUniqueInput>;
+  orderBy?: Array<LeaderboardEntryOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: LeaderboardEntryWhereInput;
+};
+
+
+export type QueryLeaderboardEntriesCountArgs = {
+  where?: LeaderboardEntryWhereInput;
+};
+
+
+export type QueryLeaderboardEntryArgs = {
+  where: LeaderboardEntryWhereUniqueInput;
+};
+
+
+export type QueryLeaderboardsArgs = {
+  cursor?: InputMaybe<LeaderboardWhereUniqueInput>;
+  orderBy?: Array<LeaderboardOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: LeaderboardWhereInput;
+};
+
+
+export type QueryLeaderboardsCountArgs = {
+  where?: LeaderboardWhereInput;
 };
 
 
@@ -2866,6 +4513,25 @@ export type QueryNewsArgs = {
 
 export type QueryNewsCountArgs = {
   where?: NewWhereInput;
+};
+
+
+export type QueryPScArgs = {
+  where: PscWhereUniqueInput;
+};
+
+
+export type QueryPScsArgs = {
+  cursor?: InputMaybe<PscWhereUniqueInput>;
+  orderBy?: Array<PscOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: PscWhereInput;
+};
+
+
+export type QueryPScsCountArgs = {
+  where?: PscWhereInput;
 };
 
 
@@ -3045,6 +4711,44 @@ export type QueryUserArgs = {
 };
 
 
+export type QueryUserBadgeArgs = {
+  where: UserBadgeWhereUniqueInput;
+};
+
+
+export type QueryUserBadgesArgs = {
+  cursor?: InputMaybe<UserBadgeWhereUniqueInput>;
+  orderBy?: Array<UserBadgeOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: UserBadgeWhereInput;
+};
+
+
+export type QueryUserBadgesCountArgs = {
+  where?: UserBadgeWhereInput;
+};
+
+
+export type QueryUserMemberShipArgs = {
+  where: UserMemberShipWhereUniqueInput;
+};
+
+
+export type QueryUserMemberShipsArgs = {
+  cursor?: InputMaybe<UserMemberShipWhereUniqueInput>;
+  orderBy?: Array<UserMemberShipOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: UserMemberShipWhereInput;
+};
+
+
+export type QueryUserMemberShipsCountArgs = {
+  where?: UserMemberShipWhereInput;
+};
+
+
 export type QueryUsersArgs = {
   cursor?: InputMaybe<UserWhereUniqueInput>;
   orderBy?: Array<UserOrderByInput>;
@@ -3086,6 +4790,8 @@ export type Role = {
   __typename?: 'Role';
   assignedTo?: Maybe<Array<User>>;
   assignedToCount?: Maybe<Scalars['Int']['output']>;
+  assignedToDashAdmin?: Maybe<Array<DashAdmin>>;
+  assignedToDashAdminCount?: Maybe<Scalars['Int']['output']>;
   canUserCreate?: Maybe<Scalars['Boolean']['output']>;
   canUserEditOtherPeople?: Maybe<Scalars['Boolean']['output']>;
   canUserManageAll?: Maybe<Scalars['Boolean']['output']>;
@@ -3110,8 +4816,23 @@ export type RoleAssignedToCountArgs = {
   where?: UserWhereInput;
 };
 
+
+export type RoleAssignedToDashAdminArgs = {
+  cursor?: InputMaybe<DashAdminWhereUniqueInput>;
+  orderBy?: Array<DashAdminOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: DashAdminWhereInput;
+};
+
+
+export type RoleAssignedToDashAdminCountArgs = {
+  where?: DashAdminWhereInput;
+};
+
 export type RoleCreateInput = {
   assignedTo?: InputMaybe<UserRelateToManyForCreateInput>;
+  assignedToDashAdmin?: InputMaybe<DashAdminRelateToManyForCreateInput>;
   canUserCreate?: InputMaybe<Scalars['Boolean']['input']>;
   canUserEditOtherPeople?: InputMaybe<Scalars['Boolean']['input']>;
   canUserManageAll?: InputMaybe<Scalars['Boolean']['input']>;
@@ -3119,6 +4840,12 @@ export type RoleCreateInput = {
   canUserManageRoles?: InputMaybe<Scalars['Boolean']['input']>;
   canUserSeeOtherPeople?: InputMaybe<Scalars['Boolean']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type RoleManyRelationFilter = {
+  every?: InputMaybe<RoleWhereInput>;
+  none?: InputMaybe<RoleWhereInput>;
+  some?: InputMaybe<RoleWhereInput>;
 };
 
 export type RoleOrderByInput = {
@@ -3130,6 +4857,18 @@ export type RoleOrderByInput = {
   canUserSeeOtherPeople?: InputMaybe<OrderDirection>;
   id?: InputMaybe<OrderDirection>;
   name?: InputMaybe<OrderDirection>;
+};
+
+export type RoleRelateToManyForCreateInput = {
+  connect?: InputMaybe<Array<RoleWhereUniqueInput>>;
+  create?: InputMaybe<Array<RoleCreateInput>>;
+};
+
+export type RoleRelateToManyForUpdateInput = {
+  connect?: InputMaybe<Array<RoleWhereUniqueInput>>;
+  create?: InputMaybe<Array<RoleCreateInput>>;
+  disconnect?: InputMaybe<Array<RoleWhereUniqueInput>>;
+  set?: InputMaybe<Array<RoleWhereUniqueInput>>;
 };
 
 export type RoleRelateToOneForCreateInput = {
@@ -3150,6 +4889,7 @@ export type RoleUpdateArgs = {
 
 export type RoleUpdateInput = {
   assignedTo?: InputMaybe<UserRelateToManyForUpdateInput>;
+  assignedToDashAdmin?: InputMaybe<DashAdminRelateToManyForUpdateInput>;
   canUserCreate?: InputMaybe<Scalars['Boolean']['input']>;
   canUserEditOtherPeople?: InputMaybe<Scalars['Boolean']['input']>;
   canUserManageAll?: InputMaybe<Scalars['Boolean']['input']>;
@@ -3164,6 +4904,7 @@ export type RoleWhereInput = {
   NOT?: InputMaybe<Array<RoleWhereInput>>;
   OR?: InputMaybe<Array<RoleWhereInput>>;
   assignedTo?: InputMaybe<UserManyRelationFilter>;
+  assignedToDashAdmin?: InputMaybe<DashAdminManyRelationFilter>;
   canUserCreate?: InputMaybe<BooleanFilter>;
   canUserEditOtherPeople?: InputMaybe<BooleanFilter>;
   canUserManageAll?: InputMaybe<BooleanFilter>;
@@ -3180,16 +4921,35 @@ export type RoleWhereUniqueInput = {
 
 export type Season = {
   __typename?: 'Season';
+  arenas?: Maybe<Array<Arena>>;
+  arenasCount?: Maybe<Scalars['Int']['output']>;
+  community?: Maybe<Community>;
   competitions?: Maybe<Array<Competition>>;
   competitionsCount?: Maybe<Scalars['Int']['output']>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   endDate?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['ID']['output'];
+  leaderboards?: Maybe<Array<Leaderboard>>;
+  leaderboardsCount?: Maybe<Scalars['Int']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   registerationDeadline?: Maybe<Scalars['DateTime']['output']>;
   seasonNumber?: Maybe<Scalars['Int']['output']>;
   startDate?: Maybe<Scalars['DateTime']['output']>;
   updateTable?: Maybe<Scalars['Boolean']['output']>;
+};
+
+
+export type SeasonArenasArgs = {
+  cursor?: InputMaybe<ArenaWhereUniqueInput>;
+  orderBy?: Array<ArenaOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: ArenaWhereInput;
+};
+
+
+export type SeasonArenasCountArgs = {
+  where?: ArenaWhereInput;
 };
 
 
@@ -3206,10 +4966,27 @@ export type SeasonCompetitionsCountArgs = {
   where?: CompetitionWhereInput;
 };
 
+
+export type SeasonLeaderboardsArgs = {
+  cursor?: InputMaybe<LeaderboardWhereUniqueInput>;
+  orderBy?: Array<LeaderboardOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: LeaderboardWhereInput;
+};
+
+
+export type SeasonLeaderboardsCountArgs = {
+  where?: LeaderboardWhereInput;
+};
+
 export type SeasonCreateInput = {
+  arenas?: InputMaybe<ArenaRelateToManyForCreateInput>;
+  community?: InputMaybe<CommunityRelateToOneForCreateInput>;
   competitions?: InputMaybe<CompetitionRelateToManyForCreateInput>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  leaderboards?: InputMaybe<LeaderboardRelateToManyForCreateInput>;
   name?: InputMaybe<Scalars['String']['input']>;
   registerationDeadline?: InputMaybe<Scalars['DateTime']['input']>;
   seasonNumber?: InputMaybe<Scalars['Int']['input']>;
@@ -3263,9 +5040,12 @@ export type SeasonUpdateArgs = {
 };
 
 export type SeasonUpdateInput = {
+  arenas?: InputMaybe<ArenaRelateToManyForUpdateInput>;
+  community?: InputMaybe<CommunityRelateToOneForUpdateInput>;
   competitions?: InputMaybe<CompetitionRelateToManyForUpdateInput>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  leaderboards?: InputMaybe<LeaderboardRelateToManyForUpdateInput>;
   name?: InputMaybe<Scalars['String']['input']>;
   registerationDeadline?: InputMaybe<Scalars['DateTime']['input']>;
   seasonNumber?: InputMaybe<Scalars['Int']['input']>;
@@ -3277,10 +5057,13 @@ export type SeasonWhereInput = {
   AND?: InputMaybe<Array<SeasonWhereInput>>;
   NOT?: InputMaybe<Array<SeasonWhereInput>>;
   OR?: InputMaybe<Array<SeasonWhereInput>>;
+  arenas?: InputMaybe<ArenaManyRelationFilter>;
+  community?: InputMaybe<CommunityWhereInput>;
   competitions?: InputMaybe<CompetitionManyRelationFilter>;
   createdAt?: InputMaybe<DateTimeNullableFilter>;
   endDate?: InputMaybe<DateTimeNullableFilter>;
   id?: InputMaybe<IdFilter>;
+  leaderboards?: InputMaybe<LeaderboardManyRelationFilter>;
   name?: InputMaybe<StringFilter>;
   registerationDeadline?: InputMaybe<DateTimeFilter>;
   seasonNumber?: InputMaybe<IntFilter>;
@@ -3416,11 +5199,62 @@ export type TeamWhereUniqueInput = {
 
 export type User = {
   __typename?: 'User';
+  arenaParticipations?: Maybe<Array<ArenaParticipant>>;
+  arenaParticipationsCount?: Maybe<Scalars['Int']['output']>;
+  badges?: Maybe<Array<UserBadge>>;
+  badgesCount?: Maybe<Scalars['Int']['output']>;
+  communityMemberships?: Maybe<Array<CommunityMembership>>;
+  communityMembershipsCount?: Maybe<Scalars['Int']['output']>;
   email?: Maybe<Scalars['String']['output']>;
+  experience?: Maybe<Scalars['Int']['output']>;
+  globalRank?: Maybe<Scalars['Int']['output']>;
   id: Scalars['ID']['output'];
+  level?: Maybe<Scalars['Int']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   password?: Maybe<PasswordState>;
   role?: Maybe<Role>;
+};
+
+
+export type UserArenaParticipationsArgs = {
+  cursor?: InputMaybe<ArenaParticipantWhereUniqueInput>;
+  orderBy?: Array<ArenaParticipantOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: ArenaParticipantWhereInput;
+};
+
+
+export type UserArenaParticipationsCountArgs = {
+  where?: ArenaParticipantWhereInput;
+};
+
+
+export type UserBadgesArgs = {
+  cursor?: InputMaybe<UserBadgeWhereUniqueInput>;
+  orderBy?: Array<UserBadgeOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: UserBadgeWhereInput;
+};
+
+
+export type UserBadgesCountArgs = {
+  where?: UserBadgeWhereInput;
+};
+
+
+export type UserCommunityMembershipsArgs = {
+  cursor?: InputMaybe<CommunityMembershipWhereUniqueInput>;
+  orderBy?: Array<CommunityMembershipOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: CommunityMembershipWhereInput;
+};
+
+
+export type UserCommunityMembershipsCountArgs = {
+  where?: CommunityMembershipWhereInput;
 };
 
 export type UserAuthenticationWithPasswordFailure = {
@@ -3436,8 +5270,79 @@ export type UserAuthenticationWithPasswordSuccess = {
   sessionToken: Scalars['String']['output'];
 };
 
+export type UserBadge = {
+  __typename?: 'UserBadge';
+  badge?: Maybe<Badge>;
+  earnedAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  metadata?: Maybe<Scalars['JSON']['output']>;
+  user?: Maybe<User>;
+};
+
+export type UserBadgeCreateInput = {
+  badge?: InputMaybe<BadgeRelateToOneForCreateInput>;
+  earnedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  metadata?: InputMaybe<Scalars['JSON']['input']>;
+  user?: InputMaybe<UserRelateToOneForCreateInput>;
+};
+
+export type UserBadgeManyRelationFilter = {
+  every?: InputMaybe<UserBadgeWhereInput>;
+  none?: InputMaybe<UserBadgeWhereInput>;
+  some?: InputMaybe<UserBadgeWhereInput>;
+};
+
+export type UserBadgeOrderByInput = {
+  earnedAt?: InputMaybe<OrderDirection>;
+  id?: InputMaybe<OrderDirection>;
+};
+
+export type UserBadgeRelateToManyForCreateInput = {
+  connect?: InputMaybe<Array<UserBadgeWhereUniqueInput>>;
+  create?: InputMaybe<Array<UserBadgeCreateInput>>;
+};
+
+export type UserBadgeRelateToManyForUpdateInput = {
+  connect?: InputMaybe<Array<UserBadgeWhereUniqueInput>>;
+  create?: InputMaybe<Array<UserBadgeCreateInput>>;
+  disconnect?: InputMaybe<Array<UserBadgeWhereUniqueInput>>;
+  set?: InputMaybe<Array<UserBadgeWhereUniqueInput>>;
+};
+
+export type UserBadgeUpdateArgs = {
+  data: UserBadgeUpdateInput;
+  where: UserBadgeWhereUniqueInput;
+};
+
+export type UserBadgeUpdateInput = {
+  badge?: InputMaybe<BadgeRelateToOneForUpdateInput>;
+  earnedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  metadata?: InputMaybe<Scalars['JSON']['input']>;
+  user?: InputMaybe<UserRelateToOneForUpdateInput>;
+};
+
+export type UserBadgeWhereInput = {
+  AND?: InputMaybe<Array<UserBadgeWhereInput>>;
+  NOT?: InputMaybe<Array<UserBadgeWhereInput>>;
+  OR?: InputMaybe<Array<UserBadgeWhereInput>>;
+  badge?: InputMaybe<BadgeWhereInput>;
+  earnedAt?: InputMaybe<DateTimeNullableFilter>;
+  id?: InputMaybe<IdFilter>;
+  user?: InputMaybe<UserWhereInput>;
+};
+
+export type UserBadgeWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
 export type UserCreateInput = {
+  arenaParticipations?: InputMaybe<ArenaParticipantRelateToManyForCreateInput>;
+  badges?: InputMaybe<UserBadgeRelateToManyForCreateInput>;
+  communityMemberships?: InputMaybe<CommunityMembershipRelateToManyForCreateInput>;
   email?: InputMaybe<Scalars['String']['input']>;
+  experience?: InputMaybe<Scalars['Int']['input']>;
+  globalRank?: InputMaybe<Scalars['Int']['input']>;
+  level?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<RoleRelateToOneForCreateInput>;
@@ -3451,7 +5356,10 @@ export type UserManyRelationFilter = {
 
 export type UserOrderByInput = {
   email?: InputMaybe<OrderDirection>;
+  experience?: InputMaybe<OrderDirection>;
+  globalRank?: InputMaybe<OrderDirection>;
   id?: InputMaybe<OrderDirection>;
+  level?: InputMaybe<OrderDirection>;
   name?: InputMaybe<OrderDirection>;
 };
 
@@ -3467,13 +5375,30 @@ export type UserRelateToManyForUpdateInput = {
   set?: InputMaybe<Array<UserWhereUniqueInput>>;
 };
 
+export type UserRelateToOneForCreateInput = {
+  connect?: InputMaybe<UserWhereUniqueInput>;
+  create?: InputMaybe<UserCreateInput>;
+};
+
+export type UserRelateToOneForUpdateInput = {
+  connect?: InputMaybe<UserWhereUniqueInput>;
+  create?: InputMaybe<UserCreateInput>;
+  disconnect?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export type UserUpdateArgs = {
   data: UserUpdateInput;
   where: UserWhereUniqueInput;
 };
 
 export type UserUpdateInput = {
+  arenaParticipations?: InputMaybe<ArenaParticipantRelateToManyForUpdateInput>;
+  badges?: InputMaybe<UserBadgeRelateToManyForUpdateInput>;
+  communityMemberships?: InputMaybe<CommunityMembershipRelateToManyForUpdateInput>;
   email?: InputMaybe<Scalars['String']['input']>;
+  experience?: InputMaybe<Scalars['Int']['input']>;
+  globalRank?: InputMaybe<Scalars['Int']['input']>;
+  level?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
   role?: InputMaybe<RoleRelateToOneForUpdateInput>;
@@ -3483,14 +5408,78 @@ export type UserWhereInput = {
   AND?: InputMaybe<Array<UserWhereInput>>;
   NOT?: InputMaybe<Array<UserWhereInput>>;
   OR?: InputMaybe<Array<UserWhereInput>>;
+  arenaParticipations?: InputMaybe<ArenaParticipantManyRelationFilter>;
+  badges?: InputMaybe<UserBadgeManyRelationFilter>;
+  communityMemberships?: InputMaybe<CommunityMembershipManyRelationFilter>;
   email?: InputMaybe<StringFilter>;
+  experience?: InputMaybe<IntNullableFilter>;
+  globalRank?: InputMaybe<IntNullableFilter>;
   id?: InputMaybe<IdFilter>;
+  level?: InputMaybe<IntNullableFilter>;
   name?: InputMaybe<StringFilter>;
   role?: InputMaybe<RoleWhereInput>;
 };
 
 export type UserWhereUniqueInput = {
   email?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type CommunitySeason = {
+  __typename?: 'communitySeason';
+  competition?: Maybe<Competition>;
+  id: Scalars['ID']['output'];
+  metaData?: Maybe<Scalars['JSON']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  season?: Maybe<Season>;
+};
+
+export type CommunitySeasonCreateInput = {
+  competition?: InputMaybe<CompetitionRelateToOneForCreateInput>;
+  metaData?: InputMaybe<Scalars['JSON']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  season?: InputMaybe<SeasonRelateToOneForCreateInput>;
+};
+
+export type CommunitySeasonOrderByInput = {
+  id?: InputMaybe<OrderDirection>;
+  name?: InputMaybe<OrderDirection>;
+};
+
+export type CommunitySeasonRelateToOneForCreateInput = {
+  connect?: InputMaybe<CommunitySeasonWhereUniqueInput>;
+  create?: InputMaybe<CommunitySeasonCreateInput>;
+};
+
+export type CommunitySeasonRelateToOneForUpdateInput = {
+  connect?: InputMaybe<CommunitySeasonWhereUniqueInput>;
+  create?: InputMaybe<CommunitySeasonCreateInput>;
+  disconnect?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type CommunitySeasonUpdateArgs = {
+  data: CommunitySeasonUpdateInput;
+  where: CommunitySeasonWhereUniqueInput;
+};
+
+export type CommunitySeasonUpdateInput = {
+  competition?: InputMaybe<CompetitionRelateToOneForUpdateInput>;
+  metaData?: InputMaybe<Scalars['JSON']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  season?: InputMaybe<SeasonRelateToOneForUpdateInput>;
+};
+
+export type CommunitySeasonWhereInput = {
+  AND?: InputMaybe<Array<CommunitySeasonWhereInput>>;
+  NOT?: InputMaybe<Array<CommunitySeasonWhereInput>>;
+  OR?: InputMaybe<Array<CommunitySeasonWhereInput>>;
+  competition?: InputMaybe<CompetitionWhereInput>;
+  id?: InputMaybe<IdFilter>;
+  name?: InputMaybe<StringFilter>;
+  season?: InputMaybe<SeasonWhereInput>;
+};
+
+export type CommunitySeasonWhereUniqueInput = {
   id?: InputMaybe<Scalars['ID']['input']>;
 };
 
@@ -3700,6 +5689,79 @@ export type LeagueTableWhereInput = {
 };
 
 export type LeagueTableWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type UserMemberShip = {
+  __typename?: 'userMemberShip';
+  community?: Maybe<Competition>;
+  communitySeason?: Maybe<CommunitySeason>;
+  id: Scalars['ID']['output'];
+  metaData?: Maybe<Scalars['JSON']['output']>;
+  participation?: Maybe<Participation>;
+  payment?: Maybe<Array<Payment>>;
+  paymentCount?: Maybe<Scalars['Int']['output']>;
+  player?: Maybe<Player>;
+  season?: Maybe<Season>;
+};
+
+
+export type UserMemberShipPaymentArgs = {
+  cursor?: InputMaybe<PaymentWhereUniqueInput>;
+  orderBy?: Array<PaymentOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: PaymentWhereInput;
+};
+
+
+export type UserMemberShipPaymentCountArgs = {
+  where?: PaymentWhereInput;
+};
+
+export type UserMemberShipCreateInput = {
+  community?: InputMaybe<CompetitionRelateToOneForCreateInput>;
+  communitySeason?: InputMaybe<CommunitySeasonRelateToOneForCreateInput>;
+  metaData?: InputMaybe<Scalars['JSON']['input']>;
+  participation?: InputMaybe<ParticipationRelateToOneForCreateInput>;
+  payment?: InputMaybe<PaymentRelateToManyForCreateInput>;
+  player?: InputMaybe<PlayerRelateToOneForCreateInput>;
+  season?: InputMaybe<SeasonRelateToOneForCreateInput>;
+};
+
+export type UserMemberShipOrderByInput = {
+  id?: InputMaybe<OrderDirection>;
+};
+
+export type UserMemberShipUpdateArgs = {
+  data: UserMemberShipUpdateInput;
+  where: UserMemberShipWhereUniqueInput;
+};
+
+export type UserMemberShipUpdateInput = {
+  community?: InputMaybe<CompetitionRelateToOneForUpdateInput>;
+  communitySeason?: InputMaybe<CommunitySeasonRelateToOneForUpdateInput>;
+  metaData?: InputMaybe<Scalars['JSON']['input']>;
+  participation?: InputMaybe<ParticipationRelateToOneForUpdateInput>;
+  payment?: InputMaybe<PaymentRelateToManyForUpdateInput>;
+  player?: InputMaybe<PlayerRelateToOneForUpdateInput>;
+  season?: InputMaybe<SeasonRelateToOneForUpdateInput>;
+};
+
+export type UserMemberShipWhereInput = {
+  AND?: InputMaybe<Array<UserMemberShipWhereInput>>;
+  NOT?: InputMaybe<Array<UserMemberShipWhereInput>>;
+  OR?: InputMaybe<Array<UserMemberShipWhereInput>>;
+  community?: InputMaybe<CompetitionWhereInput>;
+  communitySeason?: InputMaybe<CommunitySeasonWhereInput>;
+  id?: InputMaybe<IdFilter>;
+  participation?: InputMaybe<ParticipationWhereInput>;
+  payment?: InputMaybe<PaymentManyRelationFilter>;
+  player?: InputMaybe<PlayerWhereInput>;
+  season?: InputMaybe<SeasonWhereInput>;
+};
+
+export type UserMemberShipWhereUniqueInput = {
   id?: InputMaybe<Scalars['ID']['input']>;
 };
 

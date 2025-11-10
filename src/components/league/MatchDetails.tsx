@@ -15,6 +15,43 @@ import MatchVideos from './match/MatchVideos';
 import { MatchInterface } from '../../utils/types';
 import useMatches from '../../hooks/useMatches';
 import MatchInfo from './match/MatchInfo';
+import { BasketballMatchSummary } from '../../utils/types';
+import { simplifyTeamName } from './utils/statsUtils';
+
+const isBasketballSummary = (
+  detail: MatchInterface['actionDetails'][number]
+): detail is BasketballMatchSummary => {
+  if (!detail || typeof detail !== 'object') return false;
+  const sport = (detail as BasketballMatchSummary).sport;
+  return typeof sport === 'string' && sport.toLowerCase() === 'basketball';
+};
+
+const getBasketballPoints = (
+  totals: BasketballMatchSummary['teams']['home']['totals'],
+  quarterTotals: number,
+  fallbackScore: number
+) => {
+  if (!totals) return quarterTotals || fallbackScore;
+  if (typeof totals.points === 'number') return totals.points;
+  if (typeof totals.points === 'string' && totals.points.trim()) {
+    const parsed = Number(totals.points);
+    if (!Number.isNaN(parsed)) return parsed;
+  }
+  if (totals.fieldGoalsMade || totals.threePointersMade || totals.freeThrowsMade) {
+    const three = Number(totals.threePointersMade ?? 0);
+    const two = Number(totals.twoPointersMade ?? 0);
+    const one = Number(totals.freeThrowsMade ?? 0);
+    return three * 3 + two * 2 + one;
+  }
+  return quarterTotals || fallbackScore;
+};
+
+const getQuarterLabel = (quarter: number | string, index: number) => {
+  if (typeof quarter === 'string') {
+    return quarter.toUpperCase();
+  }
+  return index < 4 ? `Q${index + 1}` : `OT${index - 3}`;
+};
 
 export default function MatchDetails() {
   const { matchId } = useParams<{ matchId: string }>();
@@ -94,6 +131,41 @@ export default function MatchDetails() {
     }
   };
 
+  const isBasketball = match.type?.toLowerCase() === 'basketball';
+  const basketballSummary = isBasketball
+    ? (match.actionDetails || []).find(isBasketballSummary)
+    : undefined;
+  const homeQuarterScores = basketballSummary?.quarters?.map((quarter, index) => ({
+    label: getQuarterLabel(quarter.quarter, index),
+    score: quarter.home,
+  })) ?? [];
+  const awayQuarterScores = basketballSummary?.quarters?.map((quarter, index) => ({
+    label: getQuarterLabel(quarter.quarter, index),
+    score: quarter.away,
+  })) ?? [];
+  const homeQuarterTotal = homeQuarterScores.reduce(
+    (acc, quarter) => acc + (Number(quarter.score) || 0),
+    0
+  );
+  const awayQuarterTotal = awayQuarterScores.reduce(
+    (acc, quarter) => acc + (Number(quarter.score) || 0),
+    0
+  );
+  const computedHomePoints = isBasketball && basketballSummary
+    ? getBasketballPoints(
+        basketballSummary.teams.home.totals,
+        homeQuarterTotal,
+        match.homeTeamScore || 0
+      )
+    : match.homeTeamScore;
+  const computedAwayPoints = isBasketball && basketballSummary
+    ? getBasketballPoints(
+        basketballSummary.teams.away.totals,
+        awayQuarterTotal,
+        match.awayTeamScore || 0
+      )
+    : match.awayTeamScore;
+
   return (
     <div className="min-h-screen bg-brand-50 py-12 px-4">
       <div className="max-w-6xl mx-auto">
@@ -117,57 +189,179 @@ export default function MatchDetails() {
             </span>
           </div>
 
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            {/* Home Team */}
-            <div
-              className="text-center flex-1 mb-6 md:mb-0 cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate(`/team/${match.homeTeam.id}`);
-              }}
-            >
-              <h3 className="text-2xl md:text-3xl font-display font-bold text-brand-700">
-                {match.homeTeam.teams?.[0]?.name}
-              </h3>
-            </div>
+          {isBasketball && basketballSummary ? (
+            <div className="space-y-6">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+                {/* Home Team */}
+                <div
+                  className="text-center flex-1 md:text-left cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(`/team/${match.homeTeam.id}`);
+                  }}
+                >
+                  <div className="text-xs uppercase tracking-wide text-brand-400 mb-1">
+                    Home
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-display font-bold text-brand-700">
+                    {simplifyTeamName(
+                      match.homeTeam.teams?.[0]?.name ?? match.homeTeam.name
+                    )}
+                  </h3>
+                </div>
 
-            {/* Score */}
-            <div className="flex flex-col items-center justify-center px-4 md:px-8 mb-6 md:mb-0 min-w-[200px]">
-              {getMatchStatusDisplay()}
+                {/* Enhanced Score Display */}
+                <div className="flex-1">
+                  <div className="bg-gradient-to-br from-brand-900 via-brand-800 to-brand-900 rounded-2xl px-8 py-6 text-white shadow-md">
+                    <div className="flex flex-col items-center gap-3">
+                      {getMatchStatusDisplay()}
+                      <div className="flex items-center gap-6">
+                        <span className="text-5xl md:text-6xl font-display font-bold text-peach-300">
+                          {computedHomePoints}
+                        </span>
+                        <span className="text-2xl md:text-3xl text-white/50">-</span>
+                        <span className="text-5xl md:text-6xl font-display font-bold text-peach-300">
+                          {computedAwayPoints}
+                        </span>
+                      </div>
+                      <div className="text-sm text-white/70">
+                        {new Date(match.matchDate).toLocaleDateString(undefined, {
+                          weekday: 'long',
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
-              <div className="flex items-center gap-6 my-4">
-                <span className="text-5xl md:text-6xl font-display font-bold text-peach-400">
-                  {match.homeTeamScore}
-                </span>
-                <span className="text-2xl md:text-3xl text-brand-400">-</span>
-                <span className="text-5xl md:text-6xl font-display font-bold text-peach-400">
-                  {match.awayTeamScore}
-                </span>
+                {/* Away Team */}
+                <div
+                  className="text-center flex-1 md:text-right cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate(`/team/${match.awayTeam.id}`);
+                  }}
+                >
+                  <div className="text-xs uppercase tracking-wide text-brand-400 mb-1">
+                    Away
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-display font-bold text-brand-700">
+                    {simplifyTeamName(
+                      match.awayTeam?.teams?.[0]?.name ?? match.awayTeam.name
+                    )}
+                  </h3>
+                </div>
               </div>
 
-              <div className="text-sm text-brand-500">
-                {new Date(match.matchDate).toLocaleDateString(undefined, {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
+              {homeQuarterScores.length > 0 && (
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[420px] bg-brand-50 rounded-xl overflow-hidden">
+                    <thead className="bg-brand-100 text-brand-500 text-xs uppercase tracking-wide">
+                      <tr>
+                        <th className="px-4 py-3 text-left font-semibold">Team</th>
+                        {homeQuarterScores.map((quarter) => (
+                          <th key={quarter.label} className="px-3 py-3 text-center font-semibold">
+                            {quarter.label}
+                          </th>
+                        ))}
+                        <th className="px-4 py-3 text-center font-semibold">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-sm text-brand-600 divide-y divide-brand-100">
+                      <tr>
+                        <td className="px-4 py-3 font-semibold text-brand-700">
+                          {simplifyTeamName(
+                            match.homeTeam.teams?.[0]?.name ?? match.homeTeam.name
+                          )}
+                        </td>
+                        {homeQuarterScores.map((quarter) => (
+                          <td key={`home-${quarter.label}`} className="px-3 py-3 text-center">
+                            {quarter.score ?? '-'}
+                          </td>
+                        ))}
+                        <td className="px-4 py-3 text-center font-semibold text-peach-500">
+                          {computedHomePoints}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td className="px-4 py-3 font-semibold text-brand-700">
+                          {simplifyTeamName(
+                            match.awayTeam?.teams?.[0]?.name ?? match.awayTeam.name
+                          )}
+                        </td>
+                        {awayQuarterScores.map((quarter) => (
+                          <td key={`away-${quarter.label}`} className="px-3 py-3 text-center">
+                            {quarter.score ?? '-'}
+                          </td>
+                        ))}
+                        <td className="px-4 py-3 text-center font-semibold text-peach-500">
+                          {computedAwayPoints}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-col md:flex-row items-center justify-between">
+              {/* Home Team */}
+              <div
+                className="text-center flex-1 mb-6 md:mb-0 cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(`/team/${match.homeTeam.id}`);
+                }}
+              >
+                <h3 className="text-2xl md:text-3xl font-display font-bold text-brand-700">
+                  {simplifyTeamName(
+                    match.homeTeam.teams?.[0]?.name ?? match.homeTeam.name
+                  )}
+                </h3>
+              </div>
+
+              {/* Score */}
+              <div className="flex flex-col items-center justify-center px-4 md:px-8 mb-6 md:mb-0 min-w-[200px]">
+                {getMatchStatusDisplay()}
+
+                <div className="flex items-center gap-6 my-4">
+                  <span className="text-5xl md:text-6xl font-display font-bold text-peach-400">
+                    {match.homeTeamScore}
+                  </span>
+                  <span className="text-2xl md:text-3xl text-brand-400">-</span>
+                  <span className="text-5xl md:text-6xl font-display font-bold text-peach-400">
+                    {match.awayTeamScore}
+                  </span>
+                </div>
+
+                <div className="text-sm text-brand-500">
+                  {new Date(match.matchDate).toLocaleDateString(undefined, {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </div>
+              </div>
+
+              {/* Away Team */}
+              <div
+                className="text-center flex-1 cursor-pointer"
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigate(`/team/${match.awayTeam.id}`);
+                }}
+              >
+                <h3 className="text-2xl md:text-3xl font-display font-bold text-brand-700">
+                  {simplifyTeamName(
+                    match.awayTeam?.teams?.[0]?.name ?? match.awayTeam.name
+                  )}
+                </h3>
               </div>
             </div>
-
-            {/* Away Team */}
-            <div
-              className="text-center flex-1 cursor-pointer"
-              onClick={(e) => {
-                e.preventDefault();
-                navigate(`/team/${match.awayTeam.id}`);
-              }}
-            >
-              <h3 className="text-2xl md:text-3xl font-display font-bold text-brand-700">
-                {match.awayTeam?.teams?.[0]?.name}
-              </h3>
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Match Details Box */}

@@ -1,11 +1,175 @@
 import {
+  BasketballMatchSummary,
   Competition,
   LeagueTableType,
+  MatchActionDetail,
   MatchInterface,
+  MatchTimelineAction,
   Season,
   TableType,
   TopPlayer,
 } from '../../../utils/types';
+
+const GENERIC_TEAM_PATTERNS = [
+  /double\s+dribble/gi,
+  /season\s+\w+/gi,
+  /league\s+\w+/gi,
+  /division\s+\w+/gi,
+];
+
+export const simplifyTeamName = (name?: string) => {
+  if (!name) return '';
+  let simplified = name;
+  GENERIC_TEAM_PATTERNS.forEach((pattern) => {
+    simplified = simplified.replace(pattern, '');
+  });
+  simplified = simplified.replace(/\s+/g, ' ').trim();
+  return simplified || name.trim();
+};
+
+interface BasketballAdvancedStats {
+  wins: number;
+  losses: number;
+  homeWins: number;
+  homeLosses: number;
+  awayWins: number;
+  awayLosses: number;
+  results: Array<'W' | 'L'>;
+}
+
+const computeBasketballAdvancedStats = (
+  matches: MatchInterface[],
+  sport: string
+) => {
+  const statsMap = new Map<string, BasketballAdvancedStats>();
+
+  const sortedMatches = [...matches].sort(
+    (a, b) =>
+      new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime()
+  );
+
+  sortedMatches.forEach((match) => {
+    if (!match.isMatchEnded) return;
+    const { homeScore, awayScore } = getScoresBySport(match, sport);
+    const homeId = match.homeTeam?.id;
+    const awayId = match.awayTeam?.id;
+    if (!homeId || !awayId) return;
+
+    if (!statsMap.has(homeId)) {
+      statsMap.set(homeId, {
+        wins: 0,
+        losses: 0,
+        homeWins: 0,
+        homeLosses: 0,
+        awayWins: 0,
+        awayLosses: 0,
+        results: [],
+      });
+    }
+    if (!statsMap.has(awayId)) {
+      statsMap.set(awayId, {
+        wins: 0,
+        losses: 0,
+        homeWins: 0,
+        homeLosses: 0,
+        awayWins: 0,
+        awayLosses: 0,
+        results: [],
+      });
+    }
+
+    const homeStats = statsMap.get(homeId)!;
+    const awayStats = statsMap.get(awayId)!;
+
+    if (homeScore > awayScore) {
+      homeStats.wins += 1;
+      homeStats.homeWins += 1;
+      homeStats.results.push('W');
+
+      awayStats.losses += 1;
+      awayStats.awayLosses += 1;
+      awayStats.results.push('L');
+    } else {
+      awayStats.wins += 1;
+      awayStats.awayWins += 1;
+      awayStats.results.push('W');
+
+      homeStats.losses += 1;
+      homeStats.homeLosses += 1;
+      homeStats.results.push('L');
+    }
+  });
+
+  return statsMap;
+};
+
+const formatWinPercentage = (wins: number, losses: number) => {
+  const games = wins + losses;
+  if (games === 0) return '0.000';
+  return (wins / games).toFixed(3);
+};
+
+const formatGamesBehind = (
+  leaderWins: number,
+  leaderLosses: number,
+  teamWins: number,
+  teamLosses: number
+) => {
+  const gb =
+    (leaderWins - teamWins + (teamLosses - leaderLosses)) / 2;
+  if (gb === 0) return '—';
+  return gb % 1 === 0 ? gb.toString() : gb.toFixed(1);
+};
+
+const formatRecord = (wins: number, losses: number) => `${wins}-${losses}`;
+
+const formatLastTen = (results: Array<'W' | 'L'>) => {
+  if (!results.length) return '0-0';
+  const lastTen = results.slice(-10);
+  const wins = lastTen.filter((result) => result === 'W').length;
+  const losses = lastTen.length - wins;
+  return `${wins}-${losses}`;
+};
+
+const formatStreak = (results: Array<'W' | 'L'>) => {
+  if (!results.length) return '—';
+  let count = 0;
+  let streakType: 'W' | 'L' | '' = '';
+  for (let i = results.length - 1; i >= 0; i--) {
+    if (!streakType) {
+      streakType = results[i];
+      count = 1;
+    } else if (results[i] === streakType) {
+      count += 1;
+    } else {
+      break;
+    }
+  }
+  return streakType ? `${streakType}${count}` : '—';
+};
+
+const isBasketballSummary = (
+  detail: MatchActionDetail
+): detail is BasketballMatchSummary => {
+  if (!detail || typeof detail !== 'object') {
+    return false;
+  }
+  const record = detail as Record<string, unknown>;
+  const sport = typeof record.sport === 'string' ? record.sport.toLowerCase() : '';
+  return (
+    sport === 'basketball' &&
+    typeof record.teams === 'object' &&
+    record.teams !== null
+  );
+};
+
+const isTimelineAction = (
+  detail: MatchActionDetail
+): detail is MatchTimelineAction => {
+  if (!detail || typeof detail !== 'object') return false;
+  const maybeAction = detail as MatchTimelineAction;
+  return typeof maybeAction.type === 'string' && typeof maybeAction.name === 'string';
+};
 
 const BASKETBALL_POINT_VALUES = {
   freethrow: 1,
@@ -14,7 +178,7 @@ const BASKETBALL_POINT_VALUES = {
 };
 
 const getBasketballActionPoints = (
-  action: MatchInterface['actionDetails'][number]
+  action: MatchTimelineAction
 ) => {
   if (typeof action?.points === 'number') {
     return action.points;
@@ -34,7 +198,9 @@ const calculateBasketballScore = (
   match: MatchInterface,
   isHomeTeam: boolean
 ) => {
-  const actions = (match.actionDetails || []).filter(
+  const actions = (match.actionDetails || [])
+    .filter(isTimelineAction)
+    .filter(
     (action) =>
       action.type?.toLowerCase() === 'points' &&
       action.isHomeTeam === isHomeTeam
@@ -684,9 +850,10 @@ export function generateCompleteLeagueTable(
     });
 
     // Process matches
-    sportMatches
-      ?.filter((m) => m.stage === 'Group Stage')
-      .forEach((match) => {
+    const groupStageMatches =
+      sportMatches?.filter((m) => m.stage === 'Group Stage') || [];
+
+    groupStageMatches.forEach((match) => {
         if (!match.isMatchEnded) return;
         const homeTeamId = match.homeTeam?.teams[0]?.id;
         const awayTeamId = match.awayTeam?.teams[0]?.id;
@@ -822,6 +989,65 @@ export function generateCompleteLeagueTable(
       return b.h2h - a.h2h;
     });
 
+    if (sport === 'basketball') {
+      const statsMap = computeBasketballAdvancedStats(
+        groupStageMatches,
+        sport
+      );
+      const leaderWins = parseInt(table[0]?.W || '0');
+      const leaderLosses = parseInt(table[0]?.L || '0');
+
+      table.forEach((team) => {
+        const stats = statsMap.get(team.partId);
+        if (!stats) {
+          team.winPercentage = '0.000';
+          team.pct = '0.000';
+          team.gamesBehind = '—';
+          team.gb = '—';
+          team.conferenceRecord = `${team.W}-${team.L}`;
+          team.conf = `${team.W}-${team.L}`;
+          team.homeRecord = '0-0';
+          team.home = '0-0';
+          team.awayRecord = '0-0';
+          team.away = '0-0';
+          team.lastTenRecord = '0-0';
+          team.l10 = '0-0';
+          team.streak = '—';
+          team.strk = '—';
+          return;
+        }
+
+        const { wins, losses, homeWins, homeLosses, awayWins, awayLosses, results } =
+          stats;
+        const pct = formatWinPercentage(wins, losses);
+
+        team.winPercentage = pct;
+        team.pct = pct;
+        team.gamesBehind = formatGamesBehind(
+          leaderWins,
+          leaderLosses,
+          wins,
+          losses
+        );
+        team.gb = team.gamesBehind;
+        const conferenceRecord = formatRecord(wins, losses);
+        team.conferenceRecord = conferenceRecord;
+        team.conf = conferenceRecord;
+        const homeRecord = formatRecord(homeWins, homeLosses);
+        team.homeRecord = homeRecord;
+        team.home = homeRecord;
+        const awayRecord = formatRecord(awayWins, awayLosses);
+        team.awayRecord = awayRecord;
+        team.away = awayRecord;
+        const lastTen = formatLastTen(results);
+        team.lastTenRecord = lastTen;
+        team.l10 = lastTen;
+        const streak = formatStreak(results);
+        team.streak = streak;
+        team.strk = streak;
+      });
+    }
+
     leagueTables[sport] = table;
   });
 
@@ -837,6 +1063,7 @@ export function generateCompleteLeagueTable(
 
       // Process actions for player statistics
       match?.actionDetails?.forEach((action) => {
+        if (!isTimelineAction(action)) return;
         const teamId = action.isHomeTeam
           ? match.homeTeam.id
           : match.awayTeam.id;
