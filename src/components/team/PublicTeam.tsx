@@ -382,7 +382,7 @@ export default function PublicTeam() {
                     player.id ??
                     `${player.name}-${player.jerseyNumber ?? 'derived'}`
                   }
-                  className="flex flex-col md:flex-row gap-2 border border-brand-200 rounded-xl p-6 hover:border-peach-400 transition-all duration-300"
+                  className="flex flex-col md:flex-row gap-4 border border-brand-200 rounded-xl p-6 hover:border-peach-400 transition-all duration-300 w-full"
                 >
                   <div>
                     <img
@@ -397,8 +397,8 @@ export default function PublicTeam() {
                       }
                     />
                   </div>
-                  <div className="flex justify-between items-start">
-                    <div>
+                  <div className="flex justify-between items-start w-full gap-6">
+                    <div className="flex-1">
                       <h3 className="text-lg font-medium text-brand-700 mb-2 items-center">
                         {player.name}{' '}
                         {player.isTeamAdmin && (
