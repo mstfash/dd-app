@@ -31,7 +31,7 @@ export default function TopPlayers({ players, statType }: TopPlayersProps) {
       case 'cleanSheets':
         return 'Clean Sheets';
       case 'mvpPoints':
-        return 'MVP Points';
+        return 'MVP Score';
       default:
         return 'Stats';
     }
@@ -43,9 +43,15 @@ export default function TopPlayers({ players, statType }: TopPlayersProps) {
   const getValue = (player: TopPlayerType) => {
     switch (statType) {
       case 'goals':
-        return player.goals;
+        return player.goals || player.points || '0';
       case 'assists':
-        return player.assists;
+        return player.assists || '0';
+      case 'cleanSheets':
+        return player.inGoals || '0';
+      case 'mvpPoints':
+        return (player as { mvpScore?: string }).mvpScore || player.points || player.goals || '0';
+      default:
+        return '0';
     }
   };
   return (

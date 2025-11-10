@@ -279,20 +279,26 @@ export interface ScoreSheet {
   homeTeam: {
     name: string;
     id: string;
-    teams: [
-      {
-        name: string;
-      }
-    ];
+    teams: Array<{
+      id?: string;
+      name: string;
+      teamLogo?: {
+        url: string;
+      };
+      mascotLogo?: string;
+    }>;
   };
   awayTeam: {
     name: string;
     id: string;
-    teams: [
-      {
-        name: string;
-      }
-    ];
+    teams: Array<{
+      id?: string;
+      name: string;
+      teamLogo?: {
+        url: string;
+      };
+      mascotLogo?: string;
+    }>;
   };
   homeTeamId: string;
   awayTeamId: string;
@@ -329,7 +335,9 @@ export interface TableType {
   conferenceRecord?: string;
   conf?: string;
   homeRecord?: string;
+  home?: string;
   awayRecord?: string;
+  away?: string;
   lastTenRecord?: string;
   l10?: string;
   streak?: string;
@@ -351,6 +359,13 @@ export interface TopPlayerType {
   PLD: string;
   teamData?: Participation;
   playerPhoto: string;
+  points?: string;
+  rebounds?: string;
+  steals?: string;
+  blocks?: string;
+  turnovers?: string;
+  plusMinus?: string;
+  minutes?: string;
 }
 
 export interface TopGoaliesType extends TopPlayerType {
@@ -371,6 +386,7 @@ export interface TopPlayer extends TopPlayerType {
   yellowCard: string;
   playerPhoto: string;
   matchesIds: string[];
+  mvpScore?: string;
 }
 export interface LeagueTableType {
   competition: Competition;

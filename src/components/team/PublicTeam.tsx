@@ -7,122 +7,16 @@ import {
 import { useQuery } from '@apollo/client';
 import useMatches from '../../hooks/useMatches';
 
+import { PlayerInterface } from '../../utils/types';
 import {
-  PlayerInterface,
-  MatchInterface,
-  MatchActionDetail,
-  BasketballMatchSummary,
-  BasketballPlayerStats,
-} from '../../utils/types';
-import { simplifyTeamName } from '../league/utils/statsUtils';
-
-type NumericValue = number | string | null | undefined;
-
-const normalizeName = (value?: string) =>
-  (value || '').replace(/\s+/g, ' ').trim().toLowerCase();
+  simplifyTeamName,
+  aggregateBasketballPlayers,
+  AggregatedBasketballPlayerStats,
+  formatSecondsToMinutesString,
+  normalizePlayerName,
+} from '../league/utils/statsUtils';
 
 const DEFAULT_PLAYER_IMAGE = 'https://i.ibb.co/RkxjQ1WG/zed4-09.png';
-
-const parseNumeric = (value: NumericValue): number => {
-  if (value === null || value === undefined) return 0;
-  if (typeof value === 'number') return value;
-  const trimmed = value.trim();
-  if (!trimmed) return 0;
-  const parsed = Number(trimmed);
-  return Number.isNaN(parsed) ? 0 : parsed;
-};
-
-const parseMinutesToSeconds = (value: NumericValue): number => {
-  if (value === null || value === undefined) return 0;
-  if (typeof value === 'number') {
-    return Math.round(value * 60);
-  }
-  const trimmed = value.trim();
-  if (!trimmed) return 0;
-  if (trimmed.includes(':')) {
-    const [minutes, seconds] = trimmed.split(':').map((part) => Number(part));
-    return (
-      (Number.isNaN(minutes) ? 0 : minutes * 60) +
-      (Number.isNaN(seconds) ? 0 : seconds)
-    );
-  }
-  const parsed = Number(trimmed);
-  if (!Number.isNaN(parsed)) {
-    return Math.round(parsed * 60);
-  }
-  return 0;
-};
-
-const formatSecondsToMinutesString = (seconds: number): string => {
-  if (!seconds) return '0:00';
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-};
-
-const statKeysLookup: Record<string, string[]> = {
-  points: ['points', 'pts', 'score', 'totalPoints'],
-  assists: ['assists', 'ast'],
-  rebounds: ['rebounds', 'reb', 'totalRebounds'],
-  offensiveRebounds: ['offensiveRebounds', 'oreb'],
-  defensiveRebounds: ['defensiveRebounds', 'dreb'],
-  steals: ['steals', 'stl'],
-  blocks: ['blocks', 'blk'],
-  turnovers: ['turnovers', 'to'],
-  fouls: ['fouls', 'pf'],
-  plusMinus: ['plusMinus', 'pm', '+/-', 'plus_minus'],
-  minutes: ['minutes', 'min'],
-};
-
-const getStatValue = (
-  stats: BasketballPlayerStats,
-  key: keyof typeof statKeysLookup
-) => {
-  const keys = statKeysLookup[key];
-  for (const statKey of keys) {
-    const value = stats[statKey];
-    if (value !== undefined && value !== null && value !== '') {
-      return parseNumeric(value as NumericValue);
-    }
-  }
-  return 0;
-};
-
-const getStatMinutes = (stats: BasketballPlayerStats) => {
-  const keys = statKeysLookup.minutes;
-  for (const statKey of keys) {
-    const value = stats[statKey];
-    if (value !== undefined && value !== null && value !== '') {
-      return parseMinutesToSeconds(value as NumericValue);
-    }
-  }
-  return 0;
-};
-
-const isBasketballSummary = (
-  detail: MatchActionDetail
-): detail is BasketballMatchSummary => {
-  if (!detail || typeof detail !== 'object') return false;
-  const sport = (detail as BasketballMatchSummary).sport;
-  return typeof sport === 'string' && sport.toLowerCase() === 'basketball';
-};
-
-interface AggregatedPlayerStats {
-  displayName: string;
-  normalizedName: string;
-  position?: string;
-  photo?: string;
-  jerseyNumber?: number;
-  matches: Set<string>;
-  minutes: number;
-  points: number;
-  assists: number;
-  rebounds: number;
-  steals: number;
-  blocks: number;
-  turnovers: number;
-  plusMinus: number;
-}
 
 interface PlayerSeasonStats {
   matchesPlayed: number;
@@ -149,7 +43,9 @@ interface PublicTeamPlayerCard {
   source: 'official' | 'derived';
 }
 
-const buildSeasonStats = (entry?: AggregatedPlayerStats): PlayerSeasonStats => {
+const buildSeasonStats = (
+  entry?: AggregatedBasketballPlayerStats
+): PlayerSeasonStats => {
   if (!entry) {
     return {
       matchesPlayed: 0,
@@ -177,151 +73,17 @@ const buildSeasonStats = (entry?: AggregatedPlayerStats): PlayerSeasonStats => {
   };
 };
 
-const ensurePlayerEntry = (
-  map: Map<string, AggregatedPlayerStats>,
-  name: string
-): AggregatedPlayerStats => {
-  const normalizedName = normalizeName(name);
-  const existing = map.get(normalizedName);
-  if (existing) {
-    if (!existing.displayName && name) {
-      existing.displayName = name;
-    }
-    return existing;
-  }
-  const entry: AggregatedPlayerStats = {
-    displayName: name,
-    normalizedName,
-    matches: new Set(),
-    minutes: 0,
-    points: 0,
-    assists: 0,
-    rebounds: 0,
-    steals: 0,
-    blocks: 0,
-    turnovers: 0,
-    plusMinus: 0,
-  };
-  map.set(normalizedName, entry);
-  return entry;
-};
-
-const aggregateTeamPlayers = (
-  matches: MatchInterface[] | null,
-  teamId: string | undefined,
-  sportType?: string
-) => {
-  if (!teamId || !matches?.length)
-    return new Map<string, AggregatedPlayerStats>();
-
-  const teamMatches = matches.filter(
-    (match) => match.homeTeam?.id === teamId || match.awayTeam?.id === teamId
-  );
-
-  const playerStatsMap = new Map<string, AggregatedPlayerStats>();
-
-  teamMatches.forEach((match) => {
-    const isHomeTeam = match.homeTeam?.id === teamId;
-    const teamLineup = (match.lineUp || []).filter(
-      (player) => player.isHomeTeam === isHomeTeam
-    );
-
-    const playersInMatch = new Set<string>();
-
-    teamLineup.forEach((player) => {
-      const entry = ensurePlayerEntry(playerStatsMap, player.name);
-      if (player.position && !entry.position) {
-        entry.position = player.position;
-      }
-      if (player.playerPhoto && !entry.photo) {
-        entry.photo = player.playerPhoto;
-      }
-      playersInMatch.add(entry.normalizedName);
-      entry.matches.add(match.id);
-    });
-
-    const summary = (match.actionDetails || []).find(isBasketballSummary);
-
-    if (
-      summary &&
-      (match.type?.toLowerCase() === 'basketball' || sportType === 'basketball')
-    ) {
-      const snapshot = isHomeTeam ? summary.teams.home : summary.teams.away;
-      snapshot.players?.forEach((player) => {
-        const entry = ensurePlayerEntry(playerStatsMap, player.playerName);
-        playersInMatch.add(entry.normalizedName);
-        entry.matches.add(match.id);
-        if (player.stats) {
-          entry.minutes += getStatMinutes(player.stats);
-          const reboundsTotal =
-            getStatValue(player.stats, 'rebounds') ||
-            getStatValue(player.stats, 'offensiveRebounds') +
-              getStatValue(player.stats, 'defensiveRebounds');
-          entry.points += getStatValue(player.stats, 'points');
-          entry.assists += getStatValue(player.stats, 'assists');
-          entry.rebounds += reboundsTotal;
-          entry.steals += getStatValue(player.stats, 'steals');
-          entry.blocks += getStatValue(player.stats, 'blocks');
-          entry.turnovers += getStatValue(player.stats, 'turnovers');
-          entry.plusMinus += getStatValue(player.stats, 'plusMinus');
-        }
-      });
-    }
-
-    (match.actionDetails || []).forEach((detail) => {
-      if (!detail || typeof detail !== 'object') return;
-      if (isBasketballSummary(detail)) return;
-      if (!('name' in detail) || !('type' in detail)) return;
-      const action = detail as MatchActionDetail & {
-        name: string;
-        type: string;
-        isHomeTeam?: boolean;
-        points?: number;
-        pointType?: string;
-      };
-      if (!action.name || typeof action.name !== 'string') return;
-      if (
-        typeof action.isHomeTeam === 'boolean' &&
-        action.isHomeTeam !== isHomeTeam
-      ) {
-        return;
-      }
-      const entry = ensurePlayerEntry(playerStatsMap, action.name);
-      playersInMatch.add(entry.normalizedName);
-      entry.matches.add(match.id);
-      const normalizedType = action.type?.toLowerCase();
-      if (normalizedType === 'assist') {
-        entry.assists += 1;
-      } else if (normalizedType === 'steal') {
-        entry.steals += 1;
-      } else if (normalizedType === 'block') {
-        entry.blocks += 1;
-      } else if (normalizedType === 'turnover') {
-        entry.turnovers += 1;
-      }
-      if (normalizedType === 'points' || action.pointType) {
-        const pointValue =
-          typeof action.points === 'number'
-            ? action.points
-            : action.pointType?.toLowerCase() === 'threepointer'
-            ? 3
-            : action.pointType?.toLowerCase() === 'freethrow'
-            ? 1
-            : 2;
-        entry.points += pointValue;
-      }
-    });
-
-    playersInMatch.forEach((playerName) => {
-      const entry = playerStatsMap.get(playerName);
-      if (entry) {
-        entry.matches.add(match.id);
-      }
-    });
-  });
-
-  return playerStatsMap;
-};
+interface PlayerSeasonStats {
+  matchesPlayed: number;
+  minutes: string;
+  points: number;
+  assists: number;
+  rebounds: number;
+  steals: number;
+  blocks: number;
+  turnovers: number;
+  plusMinus: number;
+}
 
 import { useNavigate, useParams } from 'react-router-dom';
 import { SPORTS_CONFIG } from '../../constants/sports';
@@ -402,11 +164,9 @@ export default function PublicTeam() {
   }, [playersLoading, matchesLoading]);
 
   const { statsMap, statsList } = useMemo(() => {
-    const aggregatedMap = aggregateTeamPlayers(
-      teamMatches || null,
+    const aggregatedMap = aggregateBasketballPlayers(teamMatches || null, {
       teamId,
-      sportType
-    );
+    });
     const list = Array.from(aggregatedMap.values()).map((entry) => ({
       ...entry,
     }));
@@ -422,9 +182,11 @@ export default function PublicTeam() {
         const fullName = `${player.firstName || ''} ${
           player.lastName || ''
         }`.trim();
-        const normalizedFullName = normalizeName(fullName);
-        const normalizedJerseyName = normalizeName(player.jerseyName || '');
-        const normalizedShortName = normalizeName(player.name || '');
+        const normalizedFullName = normalizePlayerName(fullName);
+        const normalizedJerseyName = normalizePlayerName(
+          player.jerseyName || ''
+        );
+        const normalizedShortName = normalizePlayerName(player.name || '');
 
         let statsEntry =
           statsMap.get(normalizedFullName) ||
@@ -433,7 +195,8 @@ export default function PublicTeam() {
 
         if (!statsEntry) {
           statsEntry = statsList.find(
-            (entry) => normalizeName(entry.displayName) === normalizedFullName
+            (entry) =>
+              normalizePlayerName(entry.displayName) === normalizedFullName
           );
         }
 

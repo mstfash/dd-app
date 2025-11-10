@@ -1,5 +1,6 @@
 import {
   BasketballMatchSummary,
+  BasketballPlayerStats,
   Competition,
   LeagueTableType,
   MatchActionDetail,
@@ -44,8 +45,7 @@ const computeBasketballAdvancedStats = (
   const statsMap = new Map<string, BasketballAdvancedStats>();
 
   const sortedMatches = [...matches].sort(
-    (a, b) =>
-      new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime()
+    (a, b) => new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime()
   );
 
   sortedMatches.forEach((match) => {
@@ -115,8 +115,7 @@ const formatGamesBehind = (
   teamWins: number,
   teamLosses: number
 ) => {
-  const gb =
-    (leaderWins - teamWins + (teamLosses - leaderLosses)) / 2;
+  const gb = (leaderWins - teamWins + (teamLosses - leaderLosses)) / 2;
   if (gb === 0) return '—';
   return gb % 1 === 0 ? gb.toString() : gb.toFixed(1);
 };
@@ -148,6 +147,122 @@ const formatStreak = (results: Array<'W' | 'L'>) => {
   return streakType ? `${streakType}${count}` : '—';
 };
 
+const BASKETBALL_PLAYER_STAT_KEYS: Record<string, string[]> = {
+  points: ['points', 'pts', 'score', 'totalPoints'],
+  assists: ['assists', 'ast'],
+  rebounds: ['rebounds', 'reb', 'totalRebounds'],
+  offensiveRebounds: ['offensiveRebounds', 'oreb'],
+  defensiveRebounds: ['defensiveRebounds', 'dreb'],
+  steals: ['steals', 'stl'],
+  blocks: ['blocks', 'blk'],
+  turnovers: ['turnovers', 'to'],
+  plusMinus: ['plusMinus', 'pm', '+/-', 'plus_minus'],
+  minutes: ['minutes', 'min'],
+  fieldGoalsMade: ['fieldGoalsMade', 'fgm'],
+  threePointersMade: ['threePointersMade', 'tpm', 'threePointers'],
+  twoPointersMade: ['twoPointersMade', 'twoPointers'],
+  freeThrowsMade: ['freeThrowsMade', 'ftm', 'freeThrows'],
+};
+
+const parseNumericStatValue = (value: unknown): number => {
+  if (value === null || value === undefined) return 0;
+  if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return 0;
+    if (trimmed.includes(':')) {
+      const [minutes, seconds] = trimmed.split(':').map((part) => Number(part));
+      const mins = Number.isNaN(minutes) ? 0 : minutes;
+      const secs = Number.isNaN(seconds) ? 0 : seconds;
+      return mins * 60 + secs;
+    }
+    const parsed = Number(trimmed);
+    return Number.isNaN(parsed) ? 0 : parsed;
+  }
+  return 0;
+};
+
+const getBasketballStatNumber = (
+  stats: BasketballPlayerStats,
+  statKey: keyof typeof BASKETBALL_PLAYER_STAT_KEYS
+) => {
+  const keys = BASKETBALL_PLAYER_STAT_KEYS[statKey];
+  for (const key of keys) {
+    const value = stats[key];
+    if (value !== undefined && value !== null && value !== '') {
+      const parsed = parseNumericStatValue(value);
+      if (parsed) return parsed;
+    }
+  }
+  return 0;
+};
+
+const computeBasketballPointsFromStats = (stats: BasketballPlayerStats) => {
+  const direct = getBasketballStatNumber(stats, 'points');
+  if (direct) return direct;
+  const threes = getBasketballStatNumber(stats, 'threePointersMade');
+  const twos = getBasketballStatNumber(stats, 'twoPointersMade');
+  const ones = getBasketballStatNumber(stats, 'freeThrowsMade');
+  if (threes || twos || ones) {
+    return threes * 3 + twos * 2 + ones;
+  }
+  return 0;
+};
+
+const computeBasketballReboundsFromStats = (stats: BasketballPlayerStats) => {
+  const direct = getBasketballStatNumber(stats, 'rebounds');
+  if (direct) return direct;
+  const offensive = getBasketballStatNumber(stats, 'offensiveRebounds');
+  const defensive = getBasketballStatNumber(stats, 'defensiveRebounds');
+  if (offensive || defensive) {
+    return offensive + defensive;
+  }
+  return 0;
+};
+
+const computeBasketballMinutesFromStats = (stats: BasketballPlayerStats) => {
+  const keys = BASKETBALL_PLAYER_STAT_KEYS.minutes;
+  for (const key of keys) {
+    const raw = stats[key];
+    if (raw === undefined || raw === null || raw === '') continue;
+    if (typeof raw === 'string' && raw.includes(':')) {
+      return parseNumericStatValue(raw);
+    }
+    const numeric = parseNumericStatValue(raw);
+    if (numeric) {
+      return numeric * 60;
+    }
+  }
+  return 0;
+};
+
+type NumericTopPlayerField =
+  | 'goals'
+  | 'assists'
+  | 'inGoals'
+  | 'points'
+  | 'rebounds'
+  | 'steals'
+  | 'blocks'
+  | 'turnovers'
+  | 'plusMinus';
+
+const addNumericStatValue = (
+  player: TopPlayer,
+  field: NumericTopPlayerField,
+  value: number
+) => {
+  if (!value) return;
+  const current = parseInt(player[field] ?? '0', 10) || 0;
+  player[field] = (current + value).toString();
+};
+
+const addMinutesValue = (player: TopPlayer, seconds: number) => {
+  if (!seconds) return;
+  const current = parseInt(player.minutes ?? '0', 10) || 0;
+  player.minutes = (current + seconds).toString();
+};
+
 const isBasketballSummary = (
   detail: MatchActionDetail
 ): detail is BasketballMatchSummary => {
@@ -155,7 +270,8 @@ const isBasketballSummary = (
     return false;
   }
   const record = detail as Record<string, unknown>;
-  const sport = typeof record.sport === 'string' ? record.sport.toLowerCase() : '';
+  const sport =
+    typeof record.sport === 'string' ? record.sport.toLowerCase() : '';
   return (
     sport === 'basketball' &&
     typeof record.teams === 'object' &&
@@ -168,7 +284,9 @@ const isTimelineAction = (
 ): detail is MatchTimelineAction => {
   if (!detail || typeof detail !== 'object') return false;
   const maybeAction = detail as MatchTimelineAction;
-  return typeof maybeAction.type === 'string' && typeof maybeAction.name === 'string';
+  return (
+    typeof maybeAction.type === 'string' && typeof maybeAction.name === 'string'
+  );
 };
 
 const BASKETBALL_POINT_VALUES = {
@@ -177,9 +295,7 @@ const BASKETBALL_POINT_VALUES = {
   threepointer: 3,
 };
 
-const getBasketballActionPoints = (
-  action: MatchTimelineAction
-) => {
+const getBasketballActionPoints = (action: MatchTimelineAction) => {
   if (typeof action?.points === 'number') {
     return action.points;
   }
@@ -201,10 +317,10 @@ const calculateBasketballScore = (
   const actions = (match.actionDetails || [])
     .filter(isTimelineAction)
     .filter(
-    (action) =>
-      action.type?.toLowerCase() === 'points' &&
-      action.isHomeTeam === isHomeTeam
-  );
+      (action) =>
+        action.type?.toLowerCase() === 'points' &&
+        action.isHomeTeam === isHomeTeam
+    );
 
   if (!actions.length) {
     return isHomeTeam ? match.homeTeamScore || 0 : match.awayTeamScore || 0;
@@ -228,6 +344,320 @@ const getScoresBySport = (match: MatchInterface, sport: string) => {
     homeScore: match.homeTeamScore || 0,
     awayScore: match.awayTeamScore || 0,
   };
+};
+
+export const normalizePlayerName = (value?: string) =>
+  (value || '').replace(/\s+/g, ' ').trim().toLowerCase();
+
+const parseMaybeNumeric = (value: unknown): number | undefined => {
+  if (value === null || value === undefined) return undefined;
+  if (typeof value === 'number') {
+    return Number.isNaN(value) ? undefined : value;
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    const parsed = Number(trimmed);
+    if (Number.isNaN(parsed)) return undefined;
+    return parsed;
+  }
+  return undefined;
+};
+
+const parseMinutesValue = (value: unknown): number | undefined => {
+  if (value === null || value === undefined) return undefined;
+  if (typeof value === 'number') {
+    return Math.round(value * 60);
+  }
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+    if (trimmed.includes(':')) {
+      const [minutesPart, secondsPart] = trimmed.split(':');
+      const minutes = Number(minutesPart);
+      const seconds = Number(secondsPart);
+      if (Number.isNaN(minutes) && Number.isNaN(seconds)) return undefined;
+      return (
+        (Number.isNaN(minutes) ? 0 : minutes * 60) +
+        (Number.isNaN(seconds) ? 0 : seconds)
+      );
+    }
+    const parsed = Number(trimmed);
+    if (Number.isNaN(parsed)) return undefined;
+    return Math.round(parsed * 60);
+  }
+  return undefined;
+};
+
+export const formatSecondsToMinutesString = (seconds: number): string => {
+  if (!seconds) return '0:00';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+};
+
+const BASKETBALL_STAT_KEYS = {
+  points: ['points', 'pts', 'score', 'totalPoints'],
+  assists: ['assists', 'ast'],
+  rebounds: ['rebounds', 'reb', 'totalRebounds'],
+  offensiveRebounds: ['offensiveRebounds', 'oreb'],
+  defensiveRebounds: ['defensiveRebounds', 'dreb'],
+  steals: ['steals', 'stl'],
+  blocks: ['blocks', 'blk'],
+  turnovers: ['turnovers', 'to'],
+  plusMinus: ['plusMinus', 'pm', '+/-', 'plus_minus'],
+  minutes: ['minutes', 'min'],
+  twoPointersMade: ['twoPointersMade', 'twoPointers'],
+  threePointersMade: ['threePointersMade', 'threePointers'],
+  freeThrowsMade: ['freeThrowsMade', 'freeThrows'],
+};
+
+const getBasketballStatFromKeys = (
+  stats: BasketballPlayerStats,
+  keys: string[]
+): number | undefined => {
+  for (const key of keys) {
+    const value = (stats as Record<string, unknown>)[key];
+    const parsed = parseMaybeNumeric(value);
+    if (parsed !== undefined) {
+      return parsed;
+    }
+  }
+  return undefined;
+};
+
+const getBasketballMinutesFromStats = (
+  stats: BasketballPlayerStats
+): number => {
+  for (const key of BASKETBALL_STAT_KEYS.minutes) {
+    const value = (stats as Record<string, unknown>)[key];
+    const parsed = parseMinutesValue(value);
+    if (parsed !== undefined) {
+      return parsed;
+    }
+  }
+  return 0;
+};
+
+const getBasketballPointsFromStats = (stats: BasketballPlayerStats): number => {
+  const explicit = getBasketballStatFromKeys(
+    stats,
+    BASKETBALL_STAT_KEYS.points
+  );
+  if (explicit !== undefined) {
+    return explicit;
+  }
+  const threePointers =
+    getBasketballStatFromKeys(stats, BASKETBALL_STAT_KEYS.threePointersMade) ||
+    0;
+  const twoPointers =
+    getBasketballStatFromKeys(stats, BASKETBALL_STAT_KEYS.twoPointersMade) || 0;
+  const freeThrows =
+    getBasketballStatFromKeys(stats, BASKETBALL_STAT_KEYS.freeThrowsMade) || 0;
+  if (threePointers || twoPointers || freeThrows) {
+    return threePointers * 3 + twoPointers * 2 + freeThrows;
+  }
+  return 0;
+};
+
+const getBasketballReboundsFromStats = (
+  stats: BasketballPlayerStats
+): number => {
+  const total = getBasketballStatFromKeys(stats, BASKETBALL_STAT_KEYS.rebounds);
+  if (total !== undefined) return total;
+  const offensive =
+    getBasketballStatFromKeys(stats, BASKETBALL_STAT_KEYS.offensiveRebounds) ||
+    0;
+  const defensive =
+    getBasketballStatFromKeys(stats, BASKETBALL_STAT_KEYS.defensiveRebounds) ||
+    0;
+  return offensive + defensive;
+};
+
+const getBasketballNumericStat = (
+  stats: BasketballPlayerStats,
+  key: keyof typeof BASKETBALL_STAT_KEYS
+): number => {
+  if (key === 'points') return getBasketballPointsFromStats(stats);
+  if (key === 'rebounds') return getBasketballReboundsFromStats(stats);
+  if (key === 'minutes') return getBasketballMinutesFromStats(stats);
+  const value = getBasketballStatFromKeys(stats, BASKETBALL_STAT_KEYS[key]);
+  return value || 0;
+};
+
+export interface AggregatedBasketballPlayerStats {
+  key: string;
+  displayName: string;
+  normalizedName: string;
+  teamId: string;
+  teamName: string;
+  matches: Set<string>;
+  minutes: number;
+  points: number;
+  assists: number;
+  rebounds: number;
+  steals: number;
+  blocks: number;
+  turnovers: number;
+  plusMinus: number;
+  position?: string;
+  photo?: string;
+  jerseyNumber?: number;
+}
+
+export const aggregateBasketballPlayers = (
+  matches: MatchInterface[] | null | undefined,
+  options: { teamId?: string } = {}
+) => {
+  const { teamId } = options;
+  const result = new Map<string, AggregatedBasketballPlayerStats>();
+
+  const relevantMatches = (matches || []).filter((match) => {
+    if (!match) return false;
+    if ((match.type || '').toLowerCase() !== 'basketball') return false;
+    if (
+      teamId &&
+      match.homeTeam?.id !== teamId &&
+      match.awayTeam?.id !== teamId
+    ) {
+      return false;
+    }
+    return true;
+  });
+
+  relevantMatches.forEach((match) => {
+    const homeTeamId = match.homeTeam?.id;
+    const awayTeamId = match.awayTeam?.id;
+    if (!homeTeamId || !awayTeamId) return;
+
+    const getTeamName = (team: MatchInterface['homeTeam']) =>
+      simplifyTeamName(team?.teams?.[0]?.name || team?.name || '');
+
+    const lineup = match.lineUp || [];
+    const homeLineup = lineup.filter((player) => player.isHomeTeam);
+    const awayLineup = lineup.filter((player) => !player.isHomeTeam);
+
+    const homeTeamInfo = {
+      id: homeTeamId,
+      name: getTeamName(match.homeTeam),
+      lineup: homeLineup,
+    };
+    const awayTeamInfo = {
+      id: awayTeamId,
+      name: getTeamName(match.awayTeam),
+      lineup: awayLineup,
+    };
+
+    const ensurePlayerEntry = (
+      teamInfo: typeof homeTeamInfo,
+      playerName: string
+    ) => {
+      const normalized = normalizePlayerName(playerName);
+      const key =
+        teamId && teamInfo.id === teamId
+          ? normalized
+          : `${normalized}-${teamInfo.id}`;
+      let entry = result.get(key);
+      if (!entry) {
+        entry = {
+          key,
+          displayName: playerName,
+          normalizedName: normalized,
+          teamId: teamInfo.id,
+          teamName: teamInfo.name,
+          matches: new Set<string>(),
+          minutes: 0,
+          points: 0,
+          assists: 0,
+          rebounds: 0,
+          steals: 0,
+          blocks: 0,
+          turnovers: 0,
+          plusMinus: 0,
+        };
+        result.set(key, entry);
+      } else if (!entry.displayName && playerName) {
+        entry.displayName = playerName;
+      }
+
+      const lineupPlayer = teamInfo.lineup.find(
+        (player) => normalizePlayerName(player.name) === normalized
+      ) as (typeof teamInfo.lineup)[number] & { jerseyNumber?: number };
+      if (lineupPlayer) {
+        if (lineupPlayer.position && !entry.position) {
+          entry.position = lineupPlayer.position;
+        }
+        if (lineupPlayer.playerPhoto && !entry.photo) {
+          entry.photo = lineupPlayer.playerPhoto;
+        }
+        if (
+          typeof lineupPlayer.jerseyNumber === 'number' &&
+          entry.jerseyNumber === undefined
+        ) {
+          entry.jerseyNumber = lineupPlayer.jerseyNumber;
+        }
+      }
+
+      entry.matches.add(match.id);
+      return entry;
+    };
+
+    const applySummaryStats = (
+      players:
+        | Array<{ playerName: string; stats?: BasketballPlayerStats }>
+        | undefined,
+      teamInfo: typeof homeTeamInfo
+    ) => {
+      players?.forEach((player) => {
+        if (!player.playerName) return;
+        const entry = ensurePlayerEntry(teamInfo, player.playerName);
+        if (player.stats) {
+          entry.minutes += getBasketballMinutesFromStats(player.stats);
+          entry.points += getBasketballPointsFromStats(player.stats);
+          entry.assists += getBasketballNumericStat(player.stats, 'assists');
+          entry.rebounds += getBasketballReboundsFromStats(player.stats);
+          entry.steals += getBasketballNumericStat(player.stats, 'steals');
+          entry.blocks += getBasketballNumericStat(player.stats, 'blocks');
+          entry.turnovers += getBasketballNumericStat(
+            player.stats,
+            'turnovers'
+          );
+          entry.plusMinus += getBasketballNumericStat(
+            player.stats,
+            'plusMinus'
+          );
+        }
+      });
+    };
+
+    const summary = (match.actionDetails || []).find(isBasketballSummary);
+    if (summary) {
+      applySummaryStats(summary.teams.home.players, homeTeamInfo);
+      applySummaryStats(summary.teams.away.players, awayTeamInfo);
+    }
+
+    (match.actionDetails || []).filter(isTimelineAction).forEach((action) => {
+      if (!action.name) return;
+      const teamInfo = action.isHomeTeam ? homeTeamInfo : awayTeamInfo;
+      const entry = ensurePlayerEntry(teamInfo, action.name);
+      const normalizedType = action.type?.toLowerCase();
+      if (normalizedType === 'assist') {
+        entry.assists += 1;
+      } else if (normalizedType === 'steal') {
+        entry.steals += 1;
+      } else if (normalizedType === 'block') {
+        entry.blocks += 1;
+      } else if (normalizedType === 'turnover') {
+        entry.turnovers += 1;
+      }
+
+      if (normalizedType === 'points' || action.pointType) {
+        entry.points += getBasketballActionPoints(action);
+      }
+    });
+  });
+
+  return result;
 };
 
 export interface SportStats {
@@ -312,6 +742,7 @@ export function calculateTournamentStats(
           h2h: 0,
           scoreSheet: [],
           participation: match.homeTeam,
+          group: match.homeTeam?.group || match.group || '',
         });
       }
 
@@ -337,6 +768,7 @@ export function calculateTournamentStats(
           h2h: 0,
           scoreSheet: [],
           participation: match.awayTeam,
+          group: match.awayTeam?.group || match.group || '',
         });
       }
     });
@@ -543,6 +975,7 @@ export function calculateTournamentStats(
     sportMatches.forEach((match) => {
       if (sport === 'football') {
         (match.actionDetails || [])
+          .filter(isTimelineAction)
           .filter((action) => action.type === 'Goal' && !action.isOwnGoal)
           .forEach((action) => {
             const team = action.isHomeTeam
@@ -580,7 +1013,7 @@ export function calculateTournamentStats(
       const completedMatches = sportMatches.filter((m) => m.isMatchEnded);
 
       switch (sport) {
-        case 'padel':
+        case 'padel': {
           // Calculate match wins and win percentage
           const padelPlayers = new Map();
           completedMatches.forEach((match) => {
@@ -627,8 +1060,9 @@ export function calculateTournamentStats(
             };
           }
           break;
+        }
 
-        case 'basketball':
+        case 'basketball': {
           // Calculate points per game
           const basketballPlayers = new Map();
           completedMatches.forEach((match) => {
@@ -669,8 +1103,9 @@ export function calculateTournamentStats(
             };
           }
           break;
+        }
 
-        case 'football':
+        case 'football': {
           // Calculate clean sheets for goalkeepers
           const goalkeepers = new Map();
           completedMatches.forEach((match) => {
@@ -703,8 +1138,9 @@ export function calculateTournamentStats(
             };
           }
           break;
+        }
 
-        case 'padbol':
+        case 'padbol': {
           // Calculate points per set
           const padbolPlayers = new Map();
           completedMatches.forEach((match) => {
@@ -745,6 +1181,7 @@ export function calculateTournamentStats(
             };
           }
           break;
+        }
       }
       return undefined;
     };
@@ -854,117 +1291,117 @@ export function generateCompleteLeagueTable(
       sportMatches?.filter((m) => m.stage === 'Group Stage') || [];
 
     groupStageMatches.forEach((match) => {
-        if (!match.isMatchEnded) return;
-        const homeTeamId = match.homeTeam?.teams[0]?.id;
-        const awayTeamId = match.awayTeam?.teams[0]?.id;
+      if (!match.isMatchEnded) return;
+      const homeTeamId = match.homeTeam?.teams[0]?.id;
+      const awayTeamId = match.awayTeam?.teams[0]?.id;
 
-        if (!homeTeamId || !awayTeamId) return;
+      if (!homeTeamId || !awayTeamId) return;
 
-        const homeTeam = teamsMap.get(homeTeamId);
-        const awayTeam = teamsMap.get(awayTeamId);
+      const homeTeam = teamsMap.get(homeTeamId);
+      const awayTeam = teamsMap.get(awayTeamId);
 
-        if (!homeTeam || !awayTeam) return;
+      if (!homeTeam || !awayTeam) return;
 
-        // Update matches played
-        homeTeam.MP = (parseInt(homeTeam.MP) + 1).toString();
-        awayTeam.MP = (parseInt(awayTeam.MP) + 1).toString();
+      // Update matches played
+      homeTeam.MP = (parseInt(homeTeam.MP) + 1).toString();
+      awayTeam.MP = (parseInt(awayTeam.MP) + 1).toString();
 
-        // Update goals
-        const { homeScore, awayScore } = getScoresBySport(match, sport);
+      // Update goals
+      const { homeScore, awayScore } = getScoresBySport(match, sport);
 
-        homeTeam.GF = (parseInt(homeTeam.GF) + homeScore).toString();
-        homeTeam.GA = (parseInt(homeTeam.GA) + awayScore).toString();
-        awayTeam.GF = (parseInt(awayTeam.GF) + awayScore).toString();
-        awayTeam.GA = (parseInt(awayTeam.GA) + homeScore).toString();
+      homeTeam.GF = (parseInt(homeTeam.GF) + homeScore).toString();
+      homeTeam.GA = (parseInt(homeTeam.GA) + awayScore).toString();
+      awayTeam.GF = (parseInt(awayTeam.GF) + awayScore).toString();
+      awayTeam.GA = (parseInt(awayTeam.GA) + homeScore).toString();
 
-        if (sport === 'basketball') {
-          homeTeam.PF = (parseInt(homeTeam.PF || '0') + homeScore).toString();
-          homeTeam.PA = (parseInt(homeTeam.PA || '0') + awayScore).toString();
-          homeTeam.PD = (
-            parseInt(homeTeam.PF || '0') - parseInt(homeTeam.PA || '0')
-          ).toString();
-          awayTeam.PF = (parseInt(awayTeam.PF || '0') + awayScore).toString();
-          awayTeam.PA = (parseInt(awayTeam.PA || '0') + homeScore).toString();
-          awayTeam.PD = (
-            parseInt(awayTeam.PF || '0') - parseInt(awayTeam.PA || '0')
-          ).toString();
-          homeTeam.GF = homeTeam.PF;
-          homeTeam.GA = homeTeam.PA;
-          homeTeam.GD = homeTeam.PD || '0';
-          awayTeam.GF = awayTeam.PF;
-          awayTeam.GA = awayTeam.PA;
-          awayTeam.GD = awayTeam.PD || '0';
-        }
+      if (sport === 'basketball') {
+        homeTeam.PF = (parseInt(homeTeam.PF || '0') + homeScore).toString();
+        homeTeam.PA = (parseInt(homeTeam.PA || '0') + awayScore).toString();
+        homeTeam.PD = (
+          parseInt(homeTeam.PF || '0') - parseInt(homeTeam.PA || '0')
+        ).toString();
+        awayTeam.PF = (parseInt(awayTeam.PF || '0') + awayScore).toString();
+        awayTeam.PA = (parseInt(awayTeam.PA || '0') + homeScore).toString();
+        awayTeam.PD = (
+          parseInt(awayTeam.PF || '0') - parseInt(awayTeam.PA || '0')
+        ).toString();
+        homeTeam.GF = homeTeam.PF;
+        homeTeam.GA = homeTeam.PA;
+        homeTeam.GD = homeTeam.PD || '0';
+        awayTeam.GF = awayTeam.PF;
+        awayTeam.GA = awayTeam.PA;
+        awayTeam.GD = awayTeam.PD || '0';
+      }
 
-        // Create score sheet entry
-        const scoreSheet = {
-          isHomeTeam: true,
-          homeTeam: match.homeTeam,
-          awayTeam: match.awayTeam,
-          homeTeamId,
-          awayTeamId,
-          homeTeamScore: homeScore,
-          awayTeamScore: awayScore,
-        };
+      // Create score sheet entry
+      const scoreSheet = {
+        isHomeTeam: true,
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        homeTeamId,
+        awayTeamId,
+        homeTeamScore: homeScore,
+        awayTeamScore: awayScore,
+      };
 
-        if (!homeTeam.group) {
-          homeTeam.group = match.group || '';
-        }
+      if (!homeTeam.group) {
+        homeTeam.group = match.group || '';
+      }
 
-        if (!awayTeam.group) {
-          awayTeam.group = match.group || '';
-        }
+      if (!awayTeam.group) {
+        awayTeam.group = match.group || '';
+      }
 
-        homeTeam.scoreSheet.push(scoreSheet);
-        awayTeam.scoreSheet.push({ ...scoreSheet, isHomeTeam: false });
+      homeTeam.scoreSheet.push(scoreSheet);
+      awayTeam.scoreSheet.push({ ...scoreSheet, isHomeTeam: false });
 
-        // Update head to head count
-        if (homeScore !== awayScore) {
-          if (homeScore > awayScore) {
-            homeTeam.h2h++;
-          } else {
-            awayTeam.h2h++;
-          }
-        }
-
-        const isBasketball = sport === 'basketball';
-
+      // Update head to head count
+      if (homeScore !== awayScore) {
         if (homeScore > awayScore) {
-          homeTeam.W = (parseInt(homeTeam.W) + 1).toString();
-          awayTeam.L = (parseInt(awayTeam.L) + 1).toString();
-          if (!isBasketball) {
-            homeTeam.PTS = (parseInt(homeTeam.PTS) + 3).toString();
-          }
-        } else if (homeScore < awayScore) {
-          awayTeam.W = (parseInt(awayTeam.W) + 1).toString();
-          homeTeam.L = (parseInt(homeTeam.L) + 1).toString();
-          if (!isBasketball) {
-            awayTeam.PTS = (parseInt(awayTeam.PTS) + 3).toString();
-          }
-        } else if (!isBasketball) {
-          homeTeam.D = (parseInt(homeTeam.D) + 1).toString();
-          awayTeam.D = (parseInt(awayTeam.D) + 1).toString();
-          homeTeam.PTS = (parseInt(homeTeam.PTS) + 1).toString();
-          awayTeam.PTS = (parseInt(awayTeam.PTS) + 1).toString();
-        }
-
-        if (isBasketball) {
-          homeTeam.PTS = homeTeam.W;
-          awayTeam.PTS = awayTeam.W;
+          homeTeam.h2h++;
         } else {
-          // Calculate goal difference for non-basketball sports
-          homeTeam.GD = (
-            parseInt(homeTeam.GF) - parseInt(homeTeam.GA)
-          ).toString();
-          awayTeam.GD = (
-            parseInt(awayTeam.GF) - parseInt(awayTeam.GA)
-          ).toString();
+          awayTeam.h2h++;
         }
+      }
 
-        // Update fair play points
-        homeTeam.FP = (match.homeTeamFairPlayPoints ? 1 : 0).toString();
-        awayTeam.FP = (match.awayTeamFairPlayPoints ? 1 : 0).toString();
-      });
+      const isBasketball = sport === 'basketball';
+
+      if (homeScore > awayScore) {
+        homeTeam.W = (parseInt(homeTeam.W) + 1).toString();
+        awayTeam.L = (parseInt(awayTeam.L) + 1).toString();
+        if (!isBasketball) {
+          homeTeam.PTS = (parseInt(homeTeam.PTS) + 3).toString();
+        }
+      } else if (homeScore < awayScore) {
+        awayTeam.W = (parseInt(awayTeam.W) + 1).toString();
+        homeTeam.L = (parseInt(homeTeam.L) + 1).toString();
+        if (!isBasketball) {
+          awayTeam.PTS = (parseInt(awayTeam.PTS) + 3).toString();
+        }
+      } else if (!isBasketball) {
+        homeTeam.D = (parseInt(homeTeam.D) + 1).toString();
+        awayTeam.D = (parseInt(awayTeam.D) + 1).toString();
+        homeTeam.PTS = (parseInt(homeTeam.PTS) + 1).toString();
+        awayTeam.PTS = (parseInt(awayTeam.PTS) + 1).toString();
+      }
+
+      if (isBasketball) {
+        homeTeam.PTS = homeTeam.W;
+        awayTeam.PTS = awayTeam.W;
+      } else {
+        // Calculate goal difference for non-basketball sports
+        homeTeam.GD = (
+          parseInt(homeTeam.GF) - parseInt(homeTeam.GA)
+        ).toString();
+        awayTeam.GD = (
+          parseInt(awayTeam.GF) - parseInt(awayTeam.GA)
+        ).toString();
+      }
+
+      // Update fair play points
+      homeTeam.FP = (match.homeTeamFairPlayPoints ? 1 : 0).toString();
+      awayTeam.FP = (match.awayTeamFairPlayPoints ? 1 : 0).toString();
+    });
 
     // Sort table by points, GD, then h2h
     const table = Array.from(teamsMap.values()).sort((a, b) => {
@@ -990,10 +1427,7 @@ export function generateCompleteLeagueTable(
     });
 
     if (sport === 'basketball') {
-      const statsMap = computeBasketballAdvancedStats(
-        groupStageMatches,
-        sport
-      );
+      const statsMap = computeBasketballAdvancedStats(groupStageMatches, sport);
       const leaderWins = parseInt(table[0]?.W || '0');
       const leaderLosses = parseInt(table[0]?.L || '0');
 
@@ -1017,8 +1451,15 @@ export function generateCompleteLeagueTable(
           return;
         }
 
-        const { wins, losses, homeWins, homeLosses, awayWins, awayLosses, results } =
-          stats;
+        const {
+          wins,
+          losses,
+          homeWins,
+          homeLosses,
+          awayWins,
+          awayLosses,
+          results,
+        } = stats;
         const pct = formatWinPercentage(wins, losses);
 
         team.winPercentage = pct;
@@ -1062,19 +1503,36 @@ export function generateCompleteLeagueTable(
       if (!match.isMatchEnded) return;
 
       // Process actions for player statistics
+      const summary = (match.actionDetails || []).find(isBasketballSummary);
+
+      const addPointsToPlayer = (player: TopPlayer, value: number) => {
+        if (!value) return;
+        addNumericStatValue(player, 'goals', value);
+        addNumericStatValue(player, 'points', value);
+      };
+
       match?.actionDetails?.forEach((action) => {
+        if (isBasketballSummary(action)) return;
         if (!isTimelineAction(action)) return;
-        const teamId = action.isHomeTeam
+        const timelineAction = action as MatchTimelineAction;
+        if (
+          summary &&
+          (match.type?.toLowerCase() === 'basketball' ||
+            selectedSport.toLowerCase() === 'basketball')
+        ) {
+          return;
+        }
+        const teamId = timelineAction.isHomeTeam
           ? match.homeTeam.id
           : match.awayTeam.id;
-        const team = action.isHomeTeam
+        const team = timelineAction.isHomeTeam
           ? match.homeTeam.teams[0]
           : match.awayTeam.teams[0];
-        const playerId = `${action.name}-${teamId}`;
+        const playerId = `${timelineAction.name}-${teamId}`;
 
         if (!playerStats.has(playerId)) {
           playerStats.set(playerId, {
-            name: action.name,
+            name: timelineAction.name,
             team: team?.name || '',
             goals: '0',
             assists: '0',
@@ -1087,6 +1545,13 @@ export function generateCompleteLeagueTable(
             yellowCard: '0',
             playerPhoto: '',
             matchesIds: [],
+            points: '0',
+            rebounds: '0',
+            steals: '0',
+            blocks: '0',
+            turnovers: '0',
+            plusMinus: '0',
+            minutes: '0',
           });
         }
 
@@ -1098,11 +1563,13 @@ export function generateCompleteLeagueTable(
           player.PLD = player.matchesIds.length.toString();
         }
 
+        const normalizedType = timelineAction.type.toLowerCase();
+
         // Update stats based on action type
-        switch (action.type.toLowerCase()) {
+        switch (normalizedType) {
           case 'goal':
-            if (!action.isOwnGoal) {
-              player.goals = (parseInt(player.goals) + 1).toString();
+            if (!timelineAction.isOwnGoal) {
+              addNumericStatValue(player, 'goals', 1);
             }
             break;
           case 'assist':
@@ -1114,6 +1581,36 @@ export function generateCompleteLeagueTable(
           case 'red card':
             player.redCard = (parseInt(player.redCard) + 1).toString();
             break;
+          case 'points': {
+            const pointValue =
+              typeof timelineAction.points === 'number'
+                ? timelineAction.points
+                : timelineAction.pointType?.toLowerCase() === 'threepointer'
+                ? 3
+                : timelineAction.pointType?.toLowerCase() === 'freethrow'
+                ? 1
+                : 2;
+            addPointsToPlayer(player, pointValue);
+            break;
+          }
+        }
+
+        if (
+          normalizedType !== 'points' &&
+          (timelineAction.pointType ||
+            normalizedType === 'twopointer' ||
+            normalizedType === 'threepointer')
+        ) {
+          const pointValue =
+            typeof timelineAction.points === 'number'
+              ? timelineAction.points
+              : timelineAction.pointType?.toLowerCase() === 'threepointer' ||
+                normalizedType === 'threepointer'
+              ? 3
+              : timelineAction.pointType?.toLowerCase() === 'freethrow'
+              ? 1
+              : 2;
+          addPointsToPlayer(player, pointValue);
         }
       });
 
@@ -1130,22 +1627,118 @@ export function generateCompleteLeagueTable(
           playerStat.playerPhoto = player.playerPhoto;
         }
       });
+
+      if (
+        summary &&
+        (match.type?.toLowerCase() === 'basketball' ||
+          selectedSport.toLowerCase() === 'basketball')
+      ) {
+        const processSnapshot = (
+          snapshot: BasketballMatchSummary['teams']['home'],
+          teamInfo: MatchInterface['homeTeam'],
+          teamId: string
+        ) => {
+          snapshot.players?.forEach((playerSnapshot) => {
+            if (!playerSnapshot.playerName) return;
+            const playerName = playerSnapshot.playerName;
+            const playerKey = `${playerName}-${teamId}`;
+            if (!playerStats.has(playerKey)) {
+              playerStats.set(playerKey, {
+                name: playerName,
+                team: teamInfo.teams?.[0]?.name || teamInfo.name || '',
+                goals: '0',
+                assists: '0',
+                photo: '',
+                position: '',
+                playerId: playerKey,
+                inGoals: '0',
+                PLD: '0',
+                redCard: '0',
+                yellowCard: '0',
+                playerPhoto: '',
+                matchesIds: [],
+                points: '0',
+                rebounds: '0',
+                steals: '0',
+                blocks: '0',
+                turnovers: '0',
+                plusMinus: '0',
+                minutes: '0',
+              });
+            }
+            const player = playerStats.get(playerKey)!;
+            if (!player.matchesIds.includes(match.id)) {
+              player.matchesIds.push(match.id);
+              player.PLD = player.matchesIds.length.toString();
+            }
+            const stats = playerSnapshot.stats || {};
+            const points = computeBasketballPointsFromStats(stats);
+            addNumericStatValue(player, 'goals', points);
+            addNumericStatValue(player, 'points', points);
+            const assists = getBasketballStatNumber(stats, 'assists');
+            addNumericStatValue(player, 'assists', assists);
+            const rebounds = computeBasketballReboundsFromStats(stats);
+            addNumericStatValue(player, 'rebounds', rebounds);
+            const steals = getBasketballStatNumber(stats, 'steals');
+            addNumericStatValue(player, 'steals', steals);
+            const blocks = getBasketballStatNumber(stats, 'blocks');
+            addNumericStatValue(player, 'blocks', blocks);
+            const turnovers = getBasketballStatNumber(stats, 'turnovers');
+            addNumericStatValue(player, 'turnovers', turnovers);
+            const plusMinus = getBasketballStatNumber(stats, 'plusMinus');
+            addNumericStatValue(player, 'plusMinus', plusMinus);
+            const minutes = computeBasketballMinutesFromStats(stats);
+            addMinutesValue(player, minutes);
+          });
+        };
+
+        if (summary.teams.home && match.homeTeam?.id) {
+          processSnapshot(
+            summary.teams.home,
+            match.homeTeam,
+            match.homeTeam.id
+          );
+        }
+        if (summary.teams.away && match.awayTeam?.id) {
+          processSnapshot(
+            summary.teams.away,
+            match.awayTeam,
+            match.awayTeam.id
+          );
+        }
+      }
     });
 
   // Convert player stats to arrays and sort
   const players = Array.from(playerStats.values());
 
+  const sportIsBasketball = selectedSport.toLowerCase() === 'basketball';
+
+  const parseStat = (value?: string) => parseInt(value ?? '0', 10) || 0;
+  const getPointsTotal = (player: TopPlayer) =>
+    parseStat(player.points ?? player.goals);
+
   const topScorer = [...players]
-    .sort((a, b) => parseInt(b.goals) - parseInt(a.goals))
+    .sort((a, b) =>
+      sportIsBasketball
+        ? getPointsTotal(b) - getPointsTotal(a)
+        : parseStat(b.goals) - parseStat(a.goals)
+    )
+    .filter((player) =>
+      sportIsBasketball
+        ? getPointsTotal(player) > 0
+        : parseStat(player.goals) > 0
+    )
     .slice(0, 10);
 
   const topAssist = [...players]
-    .sort((a, b) => parseInt(b.assists) - parseInt(a.assists))
+    .sort((a, b) => parseStat(b.assists) - parseStat(a.assists))
+    .filter((player) => parseStat(player.assists) > 0)
     .slice(0, 10);
 
   const topGoalie = players
     .filter((p) => p.position === 'GK')
-    .sort((a, b) => parseInt(b.inGoals) - parseInt(a.inGoals))
+    .sort((a, b) => parseStat(b.inGoals) - parseStat(a.inGoals))
     .slice(0, 10);
 
   const topCard = [...players]
@@ -1156,14 +1749,45 @@ export function generateCompleteLeagueTable(
     })
     .slice(0, 10);
 
-  // Top player is the one with least cards (fair play)
-  const topPlayer = [...players]
-    .sort((a, b) => {
-      const aCards = parseInt(a.redCard) * 2 + parseInt(a.yellowCard);
-      const bCards = parseInt(b.redCard) * 2 + parseInt(b.yellowCard);
-      return aCards - bCards;
-    })
-    .slice(0, 10);
+  let topPlayer: TopPlayer[];
+  if (sportIsBasketball) {
+    topPlayer = [...players]
+      .map((player) => {
+        const games = Math.max(parseInt(player.PLD) || 0, 1);
+        const pointsPerGame = getPointsTotal(player) / games;
+        const assistsPerGame = parseStat(player.assists) / games;
+        const reboundsPerGame = parseStat(player.rebounds) / games;
+        const stealsPerGame = parseStat(player.steals) / games;
+        const blocksPerGame = parseStat(player.blocks) / games;
+        const plusMinusPerGame = parseStat(player.plusMinus) / games;
+
+        const mvpScore =
+          pointsPerGame +
+          assistsPerGame * 0.7 +
+          reboundsPerGame * 0.7 +
+          stealsPerGame * 0.5 +
+          blocksPerGame * 0.5 +
+          plusMinusPerGame * 0.3;
+
+        return { player, mvpScore };
+      })
+      .filter(({ mvpScore }) => mvpScore > 0)
+      .sort((a, b) => b.mvpScore - a.mvpScore)
+      .slice(0, 10)
+      .map(({ player, mvpScore }) => {
+        player.mvpScore = mvpScore.toFixed(1);
+        return player;
+      });
+  } else {
+    // Top player is the one with least cards (fair play)
+    topPlayer = [...players]
+      .sort((a, b) => {
+        const aCards = parseInt(a.redCard) * 2 + parseInt(a.yellowCard);
+        const bCards = parseInt(b.redCard) * 2 + parseInt(b.yellowCard);
+        return aCards - bCards;
+      })
+      .slice(0, 10);
+  }
 
   return {
     competition,
