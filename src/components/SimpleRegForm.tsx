@@ -371,9 +371,9 @@ const SimpleRegForm = () => {
               <div className="flex items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
                   <img
-                    src="/logo.jpeg"
+                    src="/logo.png"
                     alt="Double Dribble"
-                    className="w-20 h-20 p-3 rounded-2xl bg-white/10 backdrop-blur"
+                    className="w-20 h-20 p-1 rounded-2xl bg-white/10 backdrop-blur"
                   />
                   <img
                     src="/3bont-logo.png"
@@ -388,7 +388,7 @@ const SimpleRegForm = () => {
 
               <div>
                 <h1 className="text-4xl font-display font-bold tracking-tight">
-                  Double Dribble League
+                  Double Dribble Men's League SZN 5
                 </h1>
                 <p className="text-brand-100 mt-4 text-sm sm:text-base">
                   Egypt's first fully data-driven basketball league. Lock in
@@ -402,25 +402,15 @@ const SimpleRegForm = () => {
                   <p className="text-xs uppercase tracking-wide text-brand-200">
                     Season Tip-Off
                   </p>
-                  <p className="text-lg font-semibold">January 2026</p>
-                </div>
-                <div className="bg-white/10 rounded-2xl p-4">
-                  <p className="text-xs uppercase tracking-wide text-brand-200">
-                    Divisions
-                  </p>
-                  <p className="text-lg font-semibold">Rec • Comp • Elite</p>
+                  <p className="text-lg font-semibold">November 14th</p>
                 </div>
                 <div className="bg-white/10 rounded-2xl p-4">
                   <p className="text-xs uppercase tracking-wide text-brand-200">
                     Venue
                   </p>
-                  <p className="text-lg font-semibold">Cairo Sports Arena</p>
-                </div>
-                <div className="bg-white/10 rounded-2xl p-4">
-                  <p className="text-xs uppercase tracking-wide text-brand-200">
-                    Prize Pool
+                  <p className="text-lg font-semibold">
+                    Maadi Sporting Club - Indoor Court
                   </p>
-                  <p className="text-lg font-semibold">200,000 EGP</p>
                 </div>
               </div>
 
@@ -429,11 +419,9 @@ const SimpleRegForm = () => {
                   What’s new in DD Season 1?
                 </h3>
                 <ul className="space-y-2 text-sm text-brand-100">
-                  <li>• Quarter-based match actions with live shot charts</li>
-                  <li>
-                    • Playoff seeding driven by wins, then point differential
-                  </li>
-                  <li>• Full roster management with easy add/remove players</li>
+                  <li>• 12 participating teams.</li>
+                  <li>• Standings/Stats Portal.</li>
+                  <li>• Full game pictures for every verified team.</li>
                   <li>• Smart scouting reports for every verified team</li>
                 </ul>
               </div>
@@ -472,7 +460,7 @@ const SimpleRegForm = () => {
                         currentSeason?.seasonNumber ??
                         ''}{' '}
                       is currently locked for registrations. We appreciate your
-                      passion—keep training and watch this space for the next
+                      passion, keep training and watch this space for the next
                       Double Dribble tip-off announcement.
                     </p>
                     <div className="mt-2 flex flex-col sm:flex-row items-center gap-3 text-xs tracking-[0.35em] text-white/60 uppercase">

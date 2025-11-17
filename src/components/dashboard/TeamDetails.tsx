@@ -84,7 +84,7 @@ export default function TeamDetails({
               src={
                 selectedPlayer.photo?.url
                   ? SERVER_URL + selectedPlayer.photo?.url
-                  : `/logo.jpeg`
+                  : `/logo.png`
               }
               alt={`${selectedPlayer.firstName} ${selectedPlayer.lastName}`}
               className="w-full h-auto"
@@ -212,7 +212,7 @@ export default function TeamDetails({
                       src={
                         player.photo?.url
                           ? SERVER_URL + player.photo?.url
-                          : `/logo.jpeg`
+                          : `/logo.png`
                       }
                       alt={`${player.firstName} ${player.lastName}`}
                       className="w-16 h-16 rounded-full object-cover cursor-pointer hover:scale-105 transition-transform"

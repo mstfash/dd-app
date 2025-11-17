@@ -2,6 +2,7 @@ import { Table, Info, LayoutGrid, LayoutList } from 'lucide-react';
 import { LeagueTableType, TableType } from '../../utils/types';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { SERVER_URL } from '../../utils/constants';
 
 interface LeagueTableProps {
   leagueData: LeagueTableType;
@@ -288,12 +289,19 @@ export default function LeagueTable({
                             </td>
                             <td className="px-4 py-4 whitespace-nowrap">
                               <div
-                                className="flex items-center cursor-pointer"
+                                className="flex items-center gap-2 cursor-pointer"
                                 onClick={(e) => {
                                   e.preventDefault();
                                   navigate(`/team/${team.partId}`);
                                 }}
                               >
+                                {team.participation?.teams?.[0]?.teamLogo?.url && (
+                                  <img
+                                    src={SERVER_URL + team.participation.teams[0].teamLogo.url}
+                                    alt={team.team}
+                                    className="w-6 h-6 object-contain rounded"
+                                  />
+                                )}
                                 <div
                                   className={`text-sm font-medium ${
                                     displayPosition <= 2
@@ -364,12 +372,19 @@ export default function LeagueTable({
                   </td>
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div
-                      className="flex items-center cursor-pointer"
+                      className="flex items-center gap-2 cursor-pointer"
                       onClick={(e) => {
                         e.preventDefault();
                         navigate(`/team/${team.partId}`);
                       }}
                     >
+                      {team.participation?.teams?.[0]?.teamLogo?.url && (
+                        <img
+                          src={SERVER_URL + team.participation.teams[0].teamLogo.url}
+                          alt={team.team}
+                          className="w-6 h-6 object-contain rounded"
+                        />
+                      )}
                       <div
                         className={`text-sm font-medium ${
                           index < 2 ? 'text-peach-400' : 'text-brand-700'

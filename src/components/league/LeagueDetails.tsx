@@ -165,7 +165,7 @@ export default function LeagueDetails() {
           <div className="flex items-center justify-center">
             <div className="md:w-32 md:h-32 w-24 h-24 rounded-2xl bg-white/10 p-4 backdrop-blur">
               <img
-                src="/logo.jpeg"
+                src="/logo.png"
                 alt="Double Dribble Logo"
                 className="w-full h-full object-contain"
               />

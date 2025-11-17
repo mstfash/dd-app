@@ -17,6 +17,7 @@ import useMatches from '../../hooks/useMatches';
 import MatchInfo from './match/MatchInfo';
 import { BasketballMatchSummary } from '../../utils/types';
 import { simplifyTeamName } from './utils/statsUtils';
+import { SERVER_URL } from '../../utils/constants';
 
 const isBasketballSummary = (
   detail: MatchInterface['actionDetails'][number]
@@ -194,7 +195,7 @@ export default function MatchDetails() {
               <div className="flex flex-col md:flex-row items-center justify-between gap-8">
                 {/* Home Team */}
                 <div
-                  className="text-center flex-1 md:text-left cursor-pointer"
+                  className="text-center flex-1 cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
                     navigate(`/team/${match.homeTeam.id}`);
@@ -203,6 +204,17 @@ export default function MatchDetails() {
                   <div className="text-xs uppercase tracking-wide text-brand-400 mb-1">
                     Home
                   </div>
+                  {match.homeTeam.teams?.[0]?.teamLogo?.url && (
+                    <div className="mb-3 flex justify-center">
+                      <img
+                        src={SERVER_URL + match.homeTeam.teams[0].teamLogo.url}
+                        alt={simplifyTeamName(
+                          match.homeTeam.teams?.[0]?.name ?? match.homeTeam.name
+                        )}
+                        className="w-24 h-24 md:w-32 md:h-32 object-contain rounded-lg"
+                      />
+                    </div>
+                  )}
                   <h3 className="text-2xl md:text-3xl font-display font-bold text-brand-700">
                     {simplifyTeamName(
                       match.homeTeam.teams?.[0]?.name ?? match.homeTeam.name
@@ -238,7 +250,7 @@ export default function MatchDetails() {
 
                 {/* Away Team */}
                 <div
-                  className="text-center flex-1 md:text-right cursor-pointer"
+                  className="text-center flex-1 cursor-pointer"
                   onClick={(e) => {
                     e.preventDefault();
                     navigate(`/team/${match.awayTeam.id}`);
@@ -247,6 +259,17 @@ export default function MatchDetails() {
                   <div className="text-xs uppercase tracking-wide text-brand-400 mb-1">
                     Away
                   </div>
+                  {match.awayTeam?.teams?.[0]?.teamLogo?.url && (
+                    <div className="mb-3 flex justify-center">
+                      <img
+                        src={SERVER_URL + match.awayTeam.teams[0].teamLogo.url}
+                        alt={simplifyTeamName(
+                          match.awayTeam?.teams?.[0]?.name ?? match.awayTeam.name
+                        )}
+                        className="w-24 h-24 md:w-32 md:h-32 object-contain rounded-lg"
+                      />
+                    </div>
+                  )}
                   <h3 className="text-2xl md:text-3xl font-display font-bold text-brand-700">
                     {simplifyTeamName(
                       match.awayTeam?.teams?.[0]?.name ?? match.awayTeam.name
@@ -315,6 +338,17 @@ export default function MatchDetails() {
                   navigate(`/team/${match.homeTeam.id}`);
                 }}
               >
+                {match.homeTeam.teams?.[0]?.teamLogo?.url && (
+                  <div className="mb-3 flex justify-center">
+                    <img
+                      src={SERVER_URL + match.homeTeam.teams[0].teamLogo.url}
+                      alt={simplifyTeamName(
+                        match.homeTeam.teams?.[0]?.name ?? match.homeTeam.name
+                      )}
+                      className="w-24 h-24 md:w-32 md:h-32 object-contain rounded-lg"
+                    />
+                  </div>
+                )}
                 <h3 className="text-2xl md:text-3xl font-display font-bold text-brand-700">
                   {simplifyTeamName(
                     match.homeTeam.teams?.[0]?.name ?? match.homeTeam.name
@@ -354,6 +388,17 @@ export default function MatchDetails() {
                   navigate(`/team/${match.awayTeam.id}`);
                 }}
               >
+                {match.awayTeam?.teams?.[0]?.teamLogo?.url && (
+                  <div className="mb-3 flex justify-center">
+                    <img
+                      src={SERVER_URL + match.awayTeam.teams[0].teamLogo.url}
+                      alt={simplifyTeamName(
+                        match.awayTeam?.teams?.[0]?.name ?? match.awayTeam.name
+                      )}
+                      className="w-24 h-24 md:w-32 md:h-32 object-contain rounded-lg"
+                    />
+                  </div>
+                )}
                 <h3 className="text-2xl md:text-3xl font-display font-bold text-brand-700">
                   {simplifyTeamName(
                     match.awayTeam?.teams?.[0]?.name ?? match.awayTeam.name

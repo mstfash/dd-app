@@ -53,6 +53,7 @@ export interface BasketballPlayerBoxScore {
   playerName: string;
   jerseyNumber?: string;
   starter?: boolean;
+  captain?: boolean;
   position?: string;
   stats: BasketballPlayerStats;
 }
