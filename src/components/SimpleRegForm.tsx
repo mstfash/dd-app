@@ -416,7 +416,7 @@ const SimpleRegForm = () => {
 
               <div className="bg-brand-900/40 rounded-2xl p-5 border border-brand-700/40">
                 <h3 className="text-lg font-semibold mb-3">
-                  What’s new in DD Season 1?
+                  What’s new in DD Season 5?
                 </h3>
                 <ul className="space-y-2 text-sm text-brand-100">
                   <li>• 12 participating teams.</li>
