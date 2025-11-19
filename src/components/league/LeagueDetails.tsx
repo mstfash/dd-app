@@ -1,6 +1,14 @@
 import { useEffect, useState, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Calendar, Shield, ArrowLeft, Medal, Award, Star } from 'lucide-react';
+import {
+  Calendar,
+  Shield,
+  ArrowLeft,
+  Medal,
+  Award,
+  Star,
+  CheckCircle,
+} from 'lucide-react';
 import LeagueTable from './LeagueTable';
 import MatchesList from './MatchesList';
 import TopPlayers from './TopPlayers';
@@ -104,6 +112,10 @@ export default function LeagueDetails() {
       match.stage !== 'Group Stage'
   );
 
+  const completedMatchesCount = useMemo(() => {
+    return leagueMatches.filter((match) => match.isMatchEnded).length;
+  }, [leagueMatches]);
+
   const leagueData =
     currentCompetition && currentSeason
       ? generateCompleteLeagueTable(
@@ -181,39 +193,19 @@ export default function LeagueDetails() {
               </span>
             </div>
             <p className="text-brand-100 text-sm max-w-3xl mb-4">
-              Wins power the standings, point differential breaks ties, and
-              every loss shapes your playoff path. No draws—every matchup
-              produces a winner.
+              Egypt's first fully data-driven basketball league. Lock in your
+              roster, compete across four quarters, and climb the table through
+              wins and point differential.
             </p>
             <div className="flex flex-wrap items-center gap-4 text-sm text-brand-100">
+              <span className="flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-peach-400" />
+                {completedMatchesCount} Completed Matches
+              </span>
               <span className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-peach-400" />
                 {leagueData.season.name}
               </span>
-              <span className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-peach-400" />
-                {isKnockout ? 'Knockout Stage' : 'Regular Season'}
-              </span>
-              <span className="flex items-center gap-2">
-                <Medal className="w-4 h-4 text-peach-400" />
-                Point diff as tiebreaker
-              </span>
-            </div>
-
-            <div className="flex flex-wrap gap-2 mt-4">
-              {uniqueSubCategories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-4 py-2 text-sm rounded-full transition-all duration-300 ${
-                    selectedCategory === cat
-                      ? 'bg-peach-500 text-white shadow-lg'
-                      : 'bg-white/10 text-brand-100 hover:bg-white/20'
-                  }`}
-                >
-                  {cat === 'all' ? 'All Divisions' : cat}
-                </button>
-              ))}
             </div>
           </div>
         </div>

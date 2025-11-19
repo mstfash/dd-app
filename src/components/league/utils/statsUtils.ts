@@ -1552,6 +1552,7 @@ export function generateCompleteLeagueTable(
             turnovers: '0',
             plusMinus: '0',
             minutes: '0',
+            teamLogoUrl: team?.teamLogo?.url || '',
           });
         }
 
@@ -1619,12 +1620,18 @@ export function generateCompleteLeagueTable(
         const teamId = player.isHomeTeam
           ? match.homeTeam.id
           : match.awayTeam.id;
+        const team = player.isHomeTeam
+          ? match.homeTeam.teams[0]
+          : match.awayTeam.teams[0];
         const playerId = `${player.name}-${teamId}`;
 
         if (playerStats.has(playerId)) {
           const playerStat = playerStats.get(playerId)!;
           playerStat.position = player.position;
           playerStat.playerPhoto = player.playerPhoto;
+          if (!playerStat.teamLogoUrl && team?.teamLogo?.url) {
+            playerStat.teamLogoUrl = team.teamLogo.url;
+          }
         }
       });
 
@@ -1664,6 +1671,7 @@ export function generateCompleteLeagueTable(
                 turnovers: '0',
                 plusMinus: '0',
                 minutes: '0',
+                teamLogoUrl: teamInfo.teams?.[0]?.teamLogo?.url || '',
               });
             }
             const player = playerStats.get(playerKey)!;

@@ -208,16 +208,52 @@ export default function TeamDetails({
               >
                 <div className="p-6">
                   <div className="flex items-center gap-4 mb-4">
-                    <img
-                      src={
-                        player.photo?.url
-                          ? SERVER_URL + player.photo?.url
-                          : `/logo.png`
-                      }
-                      alt={`${player.firstName} ${player.lastName}`}
-                      className="w-16 h-16 rounded-full object-cover cursor-pointer hover:scale-105 transition-transform"
-                      onClick={() => setSelectedPlayer(player)}
-                    />
+                    {player.photo?.url ? (
+                      <img
+                        src={SERVER_URL + player.photo.url}
+                        alt={`${player.firstName} ${player.lastName}`}
+                        className="w-16 h-16 rounded-full object-cover cursor-pointer hover:scale-105 transition-transform"
+                        onClick={() => setSelectedPlayer(player)}
+                        onError={(e) => {
+                          // Fallback to team logo if player photo fails
+                          if (participation?.teams?.[0]?.teamLogo?.url) {
+                            e.currentTarget.src = SERVER_URL + participation.teams[0].teamLogo.url;
+                            e.currentTarget.className = 'w-full h-full object-contain cursor-pointer hover:scale-105 transition-transform';
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              parent.className = 'w-16 h-16 border-2 border-brand-100 rounded-lg bg-white p-1 flex items-center justify-center';
+                            }
+                          } else {
+                            e.currentTarget.src = '/logo.png';
+                            e.currentTarget.className = 'w-16 h-16 rounded-full object-cover cursor-pointer hover:scale-105 transition-transform';
+                          }
+                        }}
+                      />
+                    ) : participation?.teams?.[0]?.teamLogo?.url ? (
+                      <div className="w-16 h-16 border-2 border-brand-100 rounded-lg bg-white p-1 flex items-center justify-center">
+                        <img
+                          src={SERVER_URL + participation.teams[0].teamLogo.url}
+                          alt={`${player.firstName} ${player.lastName}`}
+                          className="w-full h-full object-contain cursor-pointer hover:scale-105 transition-transform"
+                          onClick={() => setSelectedPlayer(player)}
+                          onError={(e) => {
+                            e.currentTarget.src = '/logo.png';
+                            e.currentTarget.className = 'w-16 h-16 rounded-full object-cover cursor-pointer hover:scale-105 transition-transform';
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              parent.className = '';
+                            }
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <img
+                        src="/logo.png"
+                        alt={`${player.firstName} ${player.lastName}`}
+                        className="w-16 h-16 rounded-full object-cover cursor-pointer hover:scale-105 transition-transform"
+                        onClick={() => setSelectedPlayer(player)}
+                      />
+                    )}
                     <div>
                       <h3 className="font-medium text-brand-600">
                         {player.firstName} {player.lastName}

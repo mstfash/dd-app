@@ -12,7 +12,7 @@ export default function MatchesList({ matches }: MatchesListProps) {
   const navigate = useNavigate();
   const [expandedGroups, setExpandedGroups] = useState<string[]>([
     'live',
-    'upcoming',
+    'completed',
   ]);
 
   // Filter states
@@ -261,44 +261,6 @@ export default function MatchesList({ matches }: MatchesListProps) {
         )}
       </div>
 
-      {/* Upcoming Matches */}
-      <div>
-        <button
-          onClick={() => toggleGroup('upcoming')}
-          className="w-full flex items-center justify-between mb-4 bg-brand-50 p-3 rounded-lg"
-        >
-          <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-brand-400" />
-            <h3 className="text-lg font-display font-semibold text-brand-700">
-              Upcoming Matches
-            </h3>
-          </div>
-          <ChevronDown
-            className={`w-5 h-5 text-brand-400 transition-transform ${
-              expandedGroups.includes('upcoming') ? 'transform rotate-180' : ''
-            }`}
-          />
-        </button>
-
-        {expandedGroups.includes('upcoming') && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-            {groupedMatches.upcoming.length > 0 ? (
-              groupedMatches.upcoming.map((match) => (
-                <MatchCard
-                  key={match.id}
-                  match={match}
-                  onClick={() => navigate(`/match/${match.id}`)}
-                />
-              ))
-            ) : (
-              <div className="col-span-2 bg-white rounded-lg p-6 text-center text-brand-400">
-                No upcoming matches scheduled.
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-
       {/* Completed Matches */}
       <div>
         <button
@@ -319,7 +281,7 @@ export default function MatchesList({ matches }: MatchesListProps) {
         </button>
 
         {expandedGroups.includes('completed') && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
             {groupedMatches.completed.length > 0 ? (
               groupedMatches.completed.map((match) => (
                 <MatchCard
@@ -331,6 +293,44 @@ export default function MatchesList({ matches }: MatchesListProps) {
             ) : (
               <div className="col-span-2 bg-white rounded-lg p-6 text-center text-brand-400">
                 No completed matches yet.
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* Upcoming Matches */}
+      <div>
+        <button
+          onClick={() => toggleGroup('upcoming')}
+          className="w-full flex items-center justify-between mb-4 bg-brand-50 p-3 rounded-lg"
+        >
+          <div className="flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-brand-400" />
+            <h3 className="text-lg font-display font-semibold text-brand-700">
+              Upcoming Matches
+            </h3>
+          </div>
+          <ChevronDown
+            className={`w-5 h-5 text-brand-400 transition-transform ${
+              expandedGroups.includes('upcoming') ? 'transform rotate-180' : ''
+            }`}
+          />
+        </button>
+
+        {expandedGroups.includes('upcoming') && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {groupedMatches.upcoming.length > 0 ? (
+              groupedMatches.upcoming.map((match) => (
+                <MatchCard
+                  key={match.id}
+                  match={match}
+                  onClick={() => navigate(`/match/${match.id}`)}
+                />
+              ))
+            ) : (
+              <div className="col-span-2 bg-white rounded-lg p-6 text-center text-brand-400">
+                No upcoming matches scheduled.
               </div>
             )}
           </div>

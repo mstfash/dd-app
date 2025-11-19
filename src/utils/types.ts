@@ -55,6 +55,7 @@ export interface BasketballPlayerBoxScore {
   starter?: boolean;
   captain?: boolean;
   position?: string;
+  photoUrl?: string;
   stats: BasketballPlayerStats;
 }
 
@@ -360,6 +361,8 @@ export interface TopPlayerType {
   PLD: string;
   teamData?: Participation;
   playerPhoto: string;
+  photoUrl?: string;
+  teamLogoUrl?: string;
   points?: string;
   rebounds?: string;
   steals?: string;

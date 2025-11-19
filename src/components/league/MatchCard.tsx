@@ -94,9 +94,6 @@ export default function MatchCard({
       <div className="md:p-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex flex-col">
-            <span className={`text-sm ${textStyles} font-bold capitalize ml-6`}>
-              {match.homeTeam.name.split(' ').pop()?.split('-').join(' ')}
-            </span>
             <div className="flex items-center gap-2">
               {getSportIcon(match.type)}
               <span className={`text-sm ${textStyles}`}>
@@ -110,7 +107,7 @@ export default function MatchCard({
         <div className="flex items-center justify-between mb-2 overflow-hidden">
           {/* Home Team */}
           <div
-            className="flex-1 text-right flex items-center cursor-pointer justify-end"
+            className="flex-1 text-right flex items-center cursor-pointer justify-end mr-3"
             onClick={(e) => {
               e.preventDefault();
               navigate(`/team/${match.homeTeam.id}`);
@@ -124,7 +121,7 @@ export default function MatchCard({
           </div>
 
           {/* Score */}
-          <div className="flex flex-col items-center gap-1 min-w-[100px]">
+          <div className="flex flex-col items-center gap-1 min-w-[100px] mx-2">
             <div className="flex items-center gap-3">
               <span
                 className={`text-2xl font-display font-bold ${
@@ -154,7 +151,7 @@ export default function MatchCard({
 
           {/* Away Team */}
           <div
-            className="flex-1 text-left pl-2 flex items-center cursor-pointer"
+            className="flex-1 text-left ml-3 flex items-center cursor-pointer"
             onClick={(e) => {
               e.preventDefault();
               navigate(`/team/${match.awayTeam.id}`);

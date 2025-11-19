@@ -1,5 +1,6 @@
 import { Trophy, Star, Award, Crown, Shield } from 'lucide-react';
 import { TopPlayerType } from '../../utils/types';
+import { SERVER_URL } from '../../utils/constants';
 
 interface TopPlayersProps {
   players: TopPlayerType[];
@@ -25,7 +26,7 @@ export default function TopPlayers({ players, statType }: TopPlayersProps) {
   const getStatLabel = () => {
     switch (statType) {
       case 'goals':
-        return 'Goals';
+        return 'Points';
       case 'assists':
         return 'Assists';
       case 'cleanSheets':
@@ -49,7 +50,12 @@ export default function TopPlayers({ players, statType }: TopPlayersProps) {
       case 'cleanSheets':
         return player.inGoals || '0';
       case 'mvpPoints':
-        return (player as { mvpScore?: string }).mvpScore || player.points || player.goals || '0';
+        return (
+          (player as { mvpScore?: string }).mvpScore ||
+          player.points ||
+          player.goals ||
+          '0'
+        );
       default:
         return '0';
     }
@@ -90,11 +96,50 @@ export default function TopPlayers({ players, statType }: TopPlayersProps) {
             </div>
 
             {/* Player Info */}
-            <div>
-              <h3 className="text-xl font-display font-bold text-brand-700 mb-1">
-                {player.name}
-              </h3>
-              <p className="text-brand-400">{player.team}</p>
+            <div className="flex items-center gap-4">
+              {player.photoUrl || player.playerPhoto || player.photo ? (
+                <img
+                  src={
+                    SERVER_URL +
+                    (player.photoUrl || player.playerPhoto || player.photo)
+                  }
+                  alt={player.name}
+                  className="w-16 h-16 rounded-full object-cover border-2 border-brand-100"
+                  onError={(e) => {
+                    // Fallback to team logo if player photo fails
+                    if (player.teamLogoUrl) {
+                      e.currentTarget.src = SERVER_URL + player.teamLogoUrl;
+                      e.currentTarget.className =
+                        'w-16 h-16 object-contain border-2 border-brand-100 rounded-lg bg-white p-1';
+                    } else {
+                      e.currentTarget.src = '/logo.png';
+                      e.currentTarget.className =
+                        'w-16 h-16 object-contain border-2 border-brand-100 rounded-lg bg-white p-1';
+                    }
+                  }}
+                />
+              ) : (
+                <div className="w-16 h-16 border-2 border-brand-100 rounded-lg bg-white p-1 flex items-center justify-center">
+                  <img
+                    src={
+                      player.teamLogoUrl
+                        ? SERVER_URL + player.teamLogoUrl
+                        : '/logo.png'
+                    }
+                    alt={player.name}
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      e.currentTarget.src = '/logo.png';
+                    }}
+                  />
+                </div>
+              )}
+              <div>
+                <h3 className="text-xl font-display font-bold text-brand-700 mb-1">
+                  {player.name}
+                </h3>
+                <p className="text-brand-400">{player.team}</p>
+              </div>
             </div>
 
             {/* Stats */}

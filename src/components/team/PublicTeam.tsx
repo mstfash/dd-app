@@ -206,6 +206,8 @@ export default function PublicTeam() {
 
         const photoUrl = player?.photo?.url
           ? SERVER_URL + player.photo.url
+          : participation?.teams?.[0]?.teamLogo?.url
+          ? SERVER_URL + participation.teams[0].teamLogo.url
           : statsEntry?.photo || DEFAULT_PLAYER_IMAGE;
 
         const displayName =
@@ -348,20 +350,23 @@ export default function PublicTeam() {
           </button>
           {/* Team Header */}
           <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-            <h1 className="text-3xl font-display font-bold text-brand-700 mb-2">
-              {participation?.teams?.[0]?.name}
-            </h1>
-
-            <div className="flex items-center gap-4 text-brand-400">
-              <span className="flex items-center gap-2 capitalize">
-                <Trophy className="w-4 h-4" />
-                {participation?.type}
-              </span>
+            <div className="flex items-center gap-4 mb-2">
+              {participation?.teams?.[0]?.teamLogo?.url && (
+                <div className="w-16 h-16 border-2 border-brand-100 rounded-lg bg-white p-1 flex items-center justify-center flex-shrink-0">
+                  <img
+                    src={SERVER_URL + participation.teams[0].teamLogo.url}
+                    alt={participation?.teams?.[0]?.name || 'Team Logo'}
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+              )}
+              <h1 className="text-3xl font-display font-bold text-brand-700">
+                {participation?.teams?.[0]?.name}
+              </h1>
             </div>
+
             <div className="flex flex-row items-center justify-between">
               <div className="flex flex-row items-center flex-wrap">
-                {returnTournament()}
-
                 <span className="px-4 py-2 bg-brand-100 text-brand-700 rounded-lg mt-4 inline-block">
                   {displayPlayers.length} Players
                 </span>
@@ -385,17 +390,67 @@ export default function PublicTeam() {
                   className="flex flex-col md:flex-row gap-4 border border-brand-200 rounded-xl p-6 hover:border-peach-400 transition-all duration-300 w-full"
                 >
                   <div>
-                    <img
-                      src={player.photo || DEFAULT_PLAYER_IMAGE}
-                      alt={player.name}
-                      className="w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                      onClick={() =>
-                        setSelectedImage({
-                          url: player.photo || DEFAULT_PLAYER_IMAGE,
-                          alt: player.name,
-                        })
-                      }
-                    />
+                    {player.photo && player.photo.startsWith(SERVER_URL) && !player.photo.includes('teamLogo') ? (
+                      <img
+                        src={player.photo}
+                        alt={player.name}
+                        className="w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                        onError={(e) => {
+                          // Fallback to team logo if player photo fails
+                          if (participation?.teams?.[0]?.teamLogo?.url) {
+                            e.currentTarget.src = SERVER_URL + participation.teams[0].teamLogo.url;
+                            e.currentTarget.className = 'w-full h-full object-contain cursor-pointer hover:opacity-80 transition-opacity';
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              parent.className = 'w-24 h-24 border-2 border-brand-100 rounded-lg bg-white p-1 flex items-center justify-center';
+                            }
+                          } else {
+                            e.currentTarget.src = DEFAULT_PLAYER_IMAGE;
+                            e.currentTarget.className = 'w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity';
+                          }
+                        }}
+                        onClick={() =>
+                          setSelectedImage({
+                            url: player.photo || DEFAULT_PLAYER_IMAGE,
+                            alt: player.name,
+                          })
+                        }
+                      />
+                    ) : participation?.teams?.[0]?.teamLogo?.url ? (
+                      <div className="w-24 h-24 border-2 border-brand-100 rounded-lg bg-white p-1 flex items-center justify-center">
+                        <img
+                          src={SERVER_URL + participation.teams[0].teamLogo.url}
+                          alt={player.name}
+                          className="w-full h-full object-contain cursor-pointer hover:opacity-80 transition-opacity"
+                          onClick={() =>
+                            setSelectedImage({
+                              url: SERVER_URL + participation.teams[0].teamLogo.url,
+                              alt: player.name,
+                            })
+                          }
+                          onError={(e) => {
+                            e.currentTarget.src = DEFAULT_PLAYER_IMAGE;
+                            e.currentTarget.className = 'w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity';
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              parent.className = '';
+                            }
+                          }}
+                        />
+                      </div>
+                    ) : (
+                      <img
+                        src={DEFAULT_PLAYER_IMAGE}
+                        alt={player.name}
+                        className="w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() =>
+                          setSelectedImage({
+                            url: DEFAULT_PLAYER_IMAGE,
+                            alt: player.name,
+                          })
+                        }
+                      />
+                    )}
                   </div>
                   <div className="flex justify-between items-start w-full gap-6">
                     <div className="flex-1">

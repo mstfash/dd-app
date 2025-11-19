@@ -381,7 +381,7 @@ const SimpleRegForm = () => {
                     className="w-20 h-20 p-3 rounded-2xl bg-white/10 backdrop-blur"
                   />
                 </div>
-                <span className="uppercase tracking-[0.35em] text-xs text-court-200">
+                <span className="ml-24 md:ml-0 uppercase tracking-[0.35em] text-xs text-court-200">
                   Basketball League
                 </span>
               </div>
