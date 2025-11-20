@@ -92,14 +92,15 @@ export default function MatchInfo({ match }: MatchInfoProps) {
               </div>
             </div>
           </div>
-
+        </div>
+        <div className="space-y-6">
           {/* Competition Info */}
           <div className="bg-brand-50 rounded-lg p-6">
             <h4 className="font-medium text-brand-700 mb-4">Competition</h4>
 
             <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <Trophy className="w-5 h-5 text-court-500 flex-shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3">
+                <Trophy className="w-5 h-5 text-court-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <div className="text-sm font-medium text-brand-700">
                     Tournament
@@ -110,8 +111,8 @@ export default function MatchInfo({ match }: MatchInfoProps) {
                 </div>
               </div>
 
-                <div className="flex items-start gap-3">
-                  <Shield className="w-5 h-5 text-court-500 flex-shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3">
+                <Shield className="w-5 h-5 text-court-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <div className="text-sm font-medium text-brand-700">
                     Stage
@@ -137,109 +138,6 @@ export default function MatchInfo({ match }: MatchInfoProps) {
               )}
             </div>
           </div>
-        </div>
-
-        <div className="space-y-6">
-          {/* Home Team Info */}
-          <div className="bg-brand-50 rounded-lg p-6">
-            <div className="flex items-center gap-4 mb-4">
-              <h4 className="font-medium text-court-500 text-bold">
-                {match.homeTeam.teams[0]?.name}
-              </h4>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-brand-400">Formation</span>
-                <span className="text-brand-700 font-medium">
-                  {match.homeTeamFormation || 'N/A'}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-brand-400">Fair Play Points</span>
-                <span className="text-brand-700 font-medium">
-                  {match.homeTeamFairPlayPoints ? 'Yes' : 'No'}
-                </span>
-              </div>
-              {match.isMatchEnded && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-brand-400">Final Score</span>
-                  <span className="text-brand-700 font-medium">
-                    {match.homeTeamScore}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Away Team Info */}
-          <div className="bg-brand-50 rounded-lg p-6">
-            <div className="flex items-center gap-4 mb-4">
-              <h4 className="font-medium text-court-500 text-bold">
-                {match.awayTeam.teams[0]?.name}
-              </h4>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-brand-400">Formation</span>
-                <span className="text-brand-700 font-medium">
-                  {match.awayTeamFormation || 'N/A'}
-                </span>
-              </div>
-              <div className="flex justify-between text-sm">
-                <span className="text-brand-400">Fair Play Points</span>
-                <span className="text-brand-700 font-medium">
-                  {match.awayTeamFairPlayPoints ? 'Yes' : 'No'}
-                </span>
-              </div>
-              {match.isMatchEnded && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-brand-400">Final Score</span>
-                  <span className="text-brand-700 font-medium">
-                    {match.awayTeamScore}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Match Statistics */}
-          {match.statistics && match.statistics.length > 0 && (
-            <div className="bg-brand-50 rounded-lg p-6">
-              <h4 className="font-medium text-brand-700 mb-4">
-                Match Statistics
-              </h4>
-
-              <div className="space-y-4">
-                {match.statistics.map((stat, index) => (
-                  <div key={index} className="flex items-center">
-                    <div className="w-1/4 text-sm text-brand-700 text-right pr-2">
-                      {stat.homeTeam}
-                    </div>
-                    <div className="w-1/2 px-2">
-                      <div className="relative h-2 bg-brand-200 rounded-full overflow-hidden">
-                        <div
-                          className="absolute left-0 top-0 bottom-0 bg-court-500 rounded-full"
-                          style={{
-                            width: `${
-                              (parseInt(stat.homeTeam) /
-                                (parseInt(stat.homeTeam) +
-                                  parseInt(stat.awayTeam))) *
-                              100
-                            }%`,
-                          }}
-                        ></div>
-                      </div>
-                    </div>
-                    <div className="w-1/4 text-sm text-brand-700 pl-2">
-                      {stat.awayTeam}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>
