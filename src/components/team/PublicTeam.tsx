@@ -390,23 +390,29 @@ export default function PublicTeam() {
                   className="flex flex-col md:flex-row gap-4 border border-brand-200 rounded-xl p-6 hover:border-peach-400 transition-all duration-300 w-full"
                 >
                   <div>
-                    {player.photo && player.photo.startsWith(SERVER_URL) && !player.photo.includes('teamLogo') ? (
+                    {player.photo &&
+                    player.photo.startsWith(SERVER_URL) &&
+                    !player.photo.includes('teamLogo') ? (
                       <img
                         src={player.photo}
                         alt={player.name}
-                        className="w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                        className="w-24 h-auto object-cover cursor-pointer hover:opacity-80 transition-opacity"
                         onError={(e) => {
                           // Fallback to team logo if player photo fails
                           if (participation?.teams?.[0]?.teamLogo?.url) {
-                            e.currentTarget.src = SERVER_URL + participation.teams[0].teamLogo.url;
-                            e.currentTarget.className = 'w-full h-full object-contain cursor-pointer hover:opacity-80 transition-opacity';
+                            e.currentTarget.src =
+                              SERVER_URL + participation.teams[0].teamLogo.url;
+                            e.currentTarget.className =
+                              'w-full h-full object-contain cursor-pointer hover:opacity-80 transition-opacity';
                             const parent = e.currentTarget.parentElement;
                             if (parent) {
-                              parent.className = 'w-24 h-24 border-2 border-brand-100 rounded-lg bg-white p-1 flex items-center justify-center';
+                              parent.className =
+                                'w-24 h-24 border-2 border-brand-100 rounded-lg bg-white p-1 flex items-center justify-center';
                             }
                           } else {
                             e.currentTarget.src = DEFAULT_PLAYER_IMAGE;
-                            e.currentTarget.className = 'w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity';
+                            e.currentTarget.className =
+                              'w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity';
                           }
                         }}
                         onClick={() =>
@@ -424,13 +430,16 @@ export default function PublicTeam() {
                           className="w-full h-full object-contain cursor-pointer hover:opacity-80 transition-opacity"
                           onClick={() =>
                             setSelectedImage({
-                              url: SERVER_URL + participation.teams[0].teamLogo.url,
+                              url:
+                                SERVER_URL +
+                                participation.teams[0].teamLogo.url,
                               alt: player.name,
                             })
                           }
                           onError={(e) => {
                             e.currentTarget.src = DEFAULT_PLAYER_IMAGE;
-                            e.currentTarget.className = 'w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity';
+                            e.currentTarget.className =
+                              'w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity';
                             const parent = e.currentTarget.parentElement;
                             if (parent) {
                               parent.className = '';
