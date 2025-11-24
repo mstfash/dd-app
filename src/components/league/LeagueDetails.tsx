@@ -200,7 +200,7 @@ export default function LeagueDetails() {
             <div className="flex flex-wrap items-center gap-4 text-sm text-brand-100">
               <span className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-peach-400" />
-                {completedMatchesCount} Completed Matches
+                {completedMatchesCount} Completed Games
               </span>
               <span className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-peach-400" />
@@ -230,7 +230,7 @@ export default function LeagueDetails() {
                 : 'text-brand-400 hover:text-brand-700'
             }`}
           >
-            Matches
+            Games
           </button>
           <button
             onClick={() => setActiveTab('stats')}

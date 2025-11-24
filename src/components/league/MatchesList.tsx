@@ -269,8 +269,8 @@ export default function MatchesList({ matches }: MatchesListProps) {
         >
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-brand-400" />
-            <h3 className="text-lg font-display font-semibold text-brand-700">
-              Completed Matches
+              <h3 className="text-lg font-display font-semibold text-brand-700">
+              Completed Games
             </h3>
           </div>
           <ChevronDown
@@ -292,7 +292,7 @@ export default function MatchesList({ matches }: MatchesListProps) {
               ))
             ) : (
               <div className="col-span-2 bg-white rounded-lg p-6 text-center text-brand-400">
-                No completed matches yet.
+                No completed games yet.
               </div>
             )}
           </div>
@@ -307,8 +307,8 @@ export default function MatchesList({ matches }: MatchesListProps) {
         >
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-brand-400" />
-            <h3 className="text-lg font-display font-semibold text-brand-700">
-              Upcoming Matches
+              <h3 className="text-lg font-display font-semibold text-brand-700">
+              Upcoming Games
             </h3>
           </div>
           <ChevronDown
@@ -330,7 +330,7 @@ export default function MatchesList({ matches }: MatchesListProps) {
               ))
             ) : (
               <div className="col-span-2 bg-white rounded-lg p-6 text-center text-brand-400">
-                No upcoming matches scheduled.
+                No upcoming games scheduled.
               </div>
             )}
           </div>

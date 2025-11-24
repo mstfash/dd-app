@@ -306,7 +306,7 @@ export default function MatchActions({ match }: MatchActionsProps) {
     <div>
       <h3 className="text-xl font-display font-semibold text-brand-700 mb-8 flex items-center gap-2">
         <Trophy className="w-5 h-5 text-court-500" />
-        {match.type.charAt(0).toUpperCase() + match.type.slice(1)} Match Events
+        {match.type.charAt(0).toUpperCase() + match.type.slice(1)} Game Stats
       </h3>
 
       {sortedActions.length > 0 ? (
@@ -323,7 +323,7 @@ export default function MatchActions({ match }: MatchActionsProps) {
       ) : (
         <div className="text-center p-8 bg-white rounded-lg shadow-sm">
           <p className="text-brand-400">
-            No {match.type} match events recorded yet.
+            No {match.type} game stats recorded yet.
           </p>
         </div>
       )}

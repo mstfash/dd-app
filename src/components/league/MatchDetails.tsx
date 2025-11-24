@@ -456,8 +456,8 @@ export default function MatchDetails() {
             }`}
           >
             <Goal className="w-4 h-4" />
-            <span className="hidden sm:inline">Match Events</span>
-            <span className="sm:hidden">Events</span>
+            <span className="hidden sm:inline">Game Stats</span>
+            <span className="sm:hidden">Stats</span>
           </button>
           <button
             onClick={() => setActiveTab('lineup')}

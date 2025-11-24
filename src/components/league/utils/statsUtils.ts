@@ -1558,7 +1558,7 @@ export function generateCompleteLeagueTable(
 
         const player = playerStats.get(playerId)!;
 
-        // Track unique matches played
+        // Track unique games played (based on individual player participation)
         if (!player.matchesIds.includes(match.id)) {
           player.matchesIds.push(match.id);
           player.PLD = player.matchesIds.length.toString();
@@ -1627,8 +1627,12 @@ export function generateCompleteLeagueTable(
 
         if (playerStats.has(playerId)) {
           const playerStat = playerStats.get(playerId)!;
-          playerStat.position = player.position;
-          playerStat.playerPhoto = player.playerPhoto;
+          if (player.position && !playerStat.position) {
+            playerStat.position = player.position;
+          }
+          if (player.playerPhoto && !playerStat.playerPhoto && !playerStat.photoUrl) {
+            playerStat.playerPhoto = player.playerPhoto;
+          }
           if (!playerStat.teamLogoUrl && team?.teamLogo?.url) {
             playerStat.teamLogoUrl = team.teamLogo.url;
           }
@@ -1656,7 +1660,7 @@ export function generateCompleteLeagueTable(
                 goals: '0',
                 assists: '0',
                 photo: '',
-                position: '',
+                position: playerSnapshot.position || '',
                 playerId: playerKey,
                 inGoals: '0',
                 PLD: '0',
@@ -1671,13 +1675,23 @@ export function generateCompleteLeagueTable(
                 turnovers: '0',
                 plusMinus: '0',
                 minutes: '0',
+                photoUrl: playerSnapshot.photoUrl || '',
                 teamLogoUrl: teamInfo.teams?.[0]?.teamLogo?.url || '',
               });
             }
             const player = playerStats.get(playerKey)!;
+            // Track unique games played (based on individual player participation)
             if (!player.matchesIds.includes(match.id)) {
               player.matchesIds.push(match.id);
               player.PLD = player.matchesIds.length.toString();
+            }
+            // Update photoUrl if available (prioritize from summary as it's more reliable)
+            if (playerSnapshot.photoUrl) {
+              player.photoUrl = playerSnapshot.photoUrl;
+            }
+            // Update position if available and not already set
+            if (playerSnapshot.position && !player.position) {
+              player.position = playerSnapshot.position;
             }
             const stats = playerSnapshot.stats || {};
             const points = computeBasketballPointsFromStats(stats);

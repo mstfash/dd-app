@@ -212,7 +212,7 @@ export default function TeamDetails({
                       <img
                         src={SERVER_URL + player.photo.url}
                         alt={`${player.firstName} ${player.lastName}`}
-                        className="w-16 h-16 rounded-full object-cover cursor-pointer hover:scale-105 transition-transform"
+                        className="w-16 h-16 rounded-full object-cover object-top cursor-pointer hover:scale-105 transition-transform"
                         onClick={() => setSelectedPlayer(player)}
                         onError={(e) => {
                           // Fallback to team logo if player photo fails
@@ -250,7 +250,7 @@ export default function TeamDetails({
                       <img
                         src="/logo.png"
                         alt={`${player.firstName} ${player.lastName}`}
-                        className="w-16 h-16 rounded-full object-cover cursor-pointer hover:scale-105 transition-transform"
+                        className="w-16 h-16 rounded-full object-cover object-top cursor-pointer hover:scale-105 transition-transform"
                         onClick={() => setSelectedPlayer(player)}
                       />
                     )}

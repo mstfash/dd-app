@@ -37,7 +37,7 @@ export default function LeagueTable({
     const commonHeaders = [
       { key: 'position', label: '#', tooltip: 'Position' },
       { key: 'team', label: 'Team', tooltip: 'Team Name' },
-      { key: 'MP', label: 'MP', tooltip: 'Matches Played' },
+      { key: 'MP', label: 'MP', tooltip: 'Games Played' },
       { key: 'W', label: 'W', tooltip: 'Wins' },
       { key: 'L', label: 'L', tooltip: 'Losses' },
     ];
@@ -57,6 +57,7 @@ export default function LeagueTable({
         { key: 'team', label: 'Team', tooltip: 'Team Name' },
         { key: 'W', label: 'W', tooltip: 'Wins' },
         { key: 'L', label: 'L', tooltip: 'Losses' },
+        { key: 'PF', label: 'PF', tooltip: 'Points For' },
         { key: 'pct', label: 'Pct', tooltip: 'Win Percentage' },
         { key: 'gb', label: 'GB', tooltip: 'Games Behind Leader' },
         { key: 'conf', label: 'Conf', tooltip: 'Conference Record' },

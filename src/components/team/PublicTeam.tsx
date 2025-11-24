@@ -86,7 +86,6 @@ interface PlayerSeasonStats {
 }
 
 import { useNavigate, useParams } from 'react-router-dom';
-import { SPORTS_CONFIG } from '../../constants/sports';
 import { SERVER_URL } from '../../utils/constants';
 
 // Add ImagePopup component
@@ -255,35 +254,6 @@ export default function PublicTeam() {
     ];
   }, [playersData?.players, statsList, statsMap, participation?.teamAdmin?.id]);
 
-  const returnTournament = () => {
-    const id = participation?.name?.split(' ').pop();
-    const type = participation?.type;
-    if (type) {
-      const found = SPORTS_CONFIG[type.toLowerCase()];
-      if (found) {
-        const tournament = found.tournaments.find((t) => t.id === id);
-        if (tournament) {
-          return (
-            <div className="flex flex-row items-center flex-wrap gap-2 mr-2 mt-4">
-              <span className="px-4 py-2 bg-orange-200 text-sage-00 rounded-lg inline-block capitalize">
-                {`${tournament?.name}`}
-              </span>
-
-              {/* <span className="px-4 py-2 bg-orange-200 text-sage-00 rounded-lg inline-block capitalize">
-                {` Fees: ${tournament?.registrationFee.toLocaleString()} EGP`}
-              </span> */}
-            </div>
-          );
-        }
-      }
-    }
-    return (
-      <span className="px-4 py-2 bg-orange-200 text-sage-00 rounded-lg mt-4 inline-block mr-2 capitalize">
-        {participation?.name?.split(' ')?.pop()?.split('-').join(' ')}
-      </span>
-    );
-  };
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-brand-50">
@@ -396,7 +366,7 @@ export default function PublicTeam() {
                       <img
                         src={player.photo}
                         alt={player.name}
-                        className="w-24 h-auto object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                        className="w-24 h-auto object-cover object-top cursor-pointer hover:opacity-80 transition-opacity"
                         onError={(e) => {
                           // Fallback to team logo if player photo fails
                           if (participation?.teams?.[0]?.teamLogo?.url) {
@@ -412,7 +382,7 @@ export default function PublicTeam() {
                           } else {
                             e.currentTarget.src = DEFAULT_PLAYER_IMAGE;
                             e.currentTarget.className =
-                              'w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity';
+                              'w-24 h-24 rounded-full object-cover object-top cursor-pointer hover:opacity-80 transition-opacity';
                           }
                         }}
                         onClick={() =>
@@ -439,7 +409,7 @@ export default function PublicTeam() {
                           onError={(e) => {
                             e.currentTarget.src = DEFAULT_PLAYER_IMAGE;
                             e.currentTarget.className =
-                              'w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity';
+                              'w-24 h-24 rounded-full object-cover object-top cursor-pointer hover:opacity-80 transition-opacity';
                             const parent = e.currentTarget.parentElement;
                             if (parent) {
                               parent.className = '';
@@ -451,7 +421,7 @@ export default function PublicTeam() {
                       <img
                         src={DEFAULT_PLAYER_IMAGE}
                         alt={player.name}
-                        className="w-24 h-24 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                        className="w-24 h-24 rounded-full object-cover object-top cursor-pointer hover:opacity-80 transition-opacity"
                         onClick={() =>
                           setSelectedImage({
                             url: DEFAULT_PLAYER_IMAGE,

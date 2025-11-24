@@ -104,7 +104,7 @@ export default function TopPlayers({ players, statType }: TopPlayersProps) {
                     (player.photoUrl || player.playerPhoto || player.photo)
                   }
                   alt={player.name}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-brand-100"
+                  className="w-16 h-16 rounded-full object-cover object-top border-2 border-brand-100"
                   onError={(e) => {
                     // Fallback to team logo if player photo fails
                     if (player.teamLogoUrl) {
@@ -143,7 +143,7 @@ export default function TopPlayers({ players, statType }: TopPlayersProps) {
             </div>
 
             {/* Stats */}
-            <div className="mt-4 pt-4 border-t border-brand-100">
+            <div className="mt-4 pt-4 border-t border-brand-100 space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-brand-400">{getStatLabel()}</span>
                 <div className="flex items-center gap-2">
@@ -157,6 +157,32 @@ export default function TopPlayers({ players, statType }: TopPlayersProps) {
                   </span>
                 </div>
               </div>
+              {statType === 'goals' && player.PLD && parseInt(player.PLD) > 0 && (
+                <div className="flex items-center justify-between text-xs text-brand-400">
+                  <span>Per Game</span>
+                  <span className="font-medium">
+                    {(
+                      parseFloat(getValue(player)) / parseInt(player.PLD)
+                    ).toFixed(1)} PPG
+                  </span>
+                </div>
+              )}
+              {statType === 'assists' && player.PLD && parseInt(player.PLD) > 0 && (
+                <div className="flex items-center justify-between text-xs text-brand-400">
+                  <span>Per Game</span>
+                  <span className="font-medium">
+                    {(
+                      parseFloat(getValue(player)) / parseInt(player.PLD)
+                    ).toFixed(1)} APG
+                  </span>
+                </div>
+              )}
+              {player.PLD && (
+                <div className="flex items-center justify-between text-xs text-brand-400">
+                  <span>Games Played</span>
+                  <span className="font-medium">{player.PLD}</span>
+                </div>
+              )}
             </div>
           </div>
         );
