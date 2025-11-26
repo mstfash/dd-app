@@ -52,19 +52,17 @@ export default function LeagueTable({
         { key: 'PTS', label: 'PTS', tooltip: 'Points' },
       ];
     } else if (sportType === 'basketball') {
+      // Instagram-style simplified columns
       return [
         { key: 'position', label: '#', tooltip: 'Position' },
         { key: 'team', label: 'Team', tooltip: 'Team Name' },
-        { key: 'W', label: 'W', tooltip: 'Wins' },
-        { key: 'L', label: 'L', tooltip: 'Losses' },
+        { key: 'MP', label: 'gp', tooltip: 'Games Played' },
+        { key: 'W', label: 'gw', tooltip: 'Games Won' },
+        { key: 'L', label: 'GL', tooltip: 'Games Lost' },
         { key: 'PF', label: 'PF', tooltip: 'Points For' },
-        { key: 'pct', label: 'Pct', tooltip: 'Win Percentage' },
-        { key: 'gb', label: 'GB', tooltip: 'Games Behind Leader' },
-        { key: 'conf', label: 'Conf', tooltip: 'Conference Record' },
-        { key: 'home', label: 'Home', tooltip: 'Home Record' },
-        { key: 'away', label: 'Away', tooltip: 'Away Record' },
-        { key: 'l10', label: 'L10', tooltip: 'Last 10 Games' },
-        { key: 'strk', label: 'Strk', tooltip: 'Current Streak' },
+        { key: 'PA', label: 'PA', tooltip: 'Points Against' },
+        { key: 'PD', label: 'PD', tooltip: 'Point Differential' },
+        { key: 'PTS', label: 'PT', tooltip: 'Points' },
       ];
     } else if (sportType === 'padel') {
       return [
@@ -87,11 +85,7 @@ export default function LeagueTable({
   const navigate = useNavigate();
 
   const resolveTeamValue = (team: TableType, key: string) => {
-    const lookupKeys = [
-      key,
-      key.toUpperCase(),
-      key.toLowerCase(),
-    ];
+    const lookupKeys = [key, key.toUpperCase(), key.toLowerCase()];
 
     switch (key.toLowerCase()) {
       case 'pct':
@@ -124,11 +118,26 @@ export default function LeagueTable({
       case 'pd':
         lookupKeys.push('GD');
         break;
+      case 'mp':
+        lookupKeys.push('MP');
+        break;
+      case 'gw':
+        lookupKeys.push('W');
+        break;
+      case 'gl':
+        lookupKeys.push('L');
+        break;
+      case 'pt':
+        lookupKeys.push('PTS');
+        break;
       default:
         break;
     }
 
-    const record = team as unknown as Record<string, string | number | undefined>;
+    const record = team as unknown as Record<
+      string,
+      string | number | undefined
+    >;
     for (const lookupKey of lookupKeys) {
       const value = record[lookupKey];
       if (value !== undefined && value !== null && value !== '') {
@@ -198,6 +207,134 @@ export default function LeagueTable({
     }
     return value;
   };
+
+  // Simplified basketball standings with custom headers
+  const renderSimplifiedBasketballStandings = () => {
+    const simplifiedHeaders = [
+      { key: 'MP', label: 'gp', tooltip: 'Games Played' },
+      { key: 'W', label: 'gw', tooltip: 'Games Won' },
+      { key: 'L', label: 'GL', tooltip: 'Games Lost' },
+      { key: 'PF', label: 'PF', tooltip: 'Points For' },
+      { key: 'PA', label: 'PA', tooltip: 'Points Against' },
+      { key: 'PD', label: 'PD', tooltip: 'Point Differential' },
+      { key: 'PTS', label: 'PT', tooltip: 'Points' },
+    ];
+
+    return (
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead>
+            <tr className="bg-brand-50">
+              <th className="px-4 py-3 text-left text-xs font-medium text-brand-400 uppercase tracking-wider">
+                #
+              </th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-brand-400 uppercase tracking-wider">
+                Team
+              </th>
+              {simplifiedHeaders.map((header) => (
+                <th
+                  key={header.key}
+                  className="px-4 py-3 text-left text-xs font-medium text-brand-400 uppercase tracking-wider"
+                  title={header.tooltip}
+                >
+                  <div className="flex items-center gap-1">
+                    {header.label}
+                    <Info className="w-3 h-3 text-brand-200" />
+                  </div>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-brand-100">
+            {tableData.map((team, index) => {
+              const isTop8 = index < 8;
+              return (
+                <tr
+                  key={team.partId}
+                  className="hover:bg-brand-50 transition-colors"
+                >
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <div
+                      className={`text-sm font-medium ${
+                        isTop8 ? 'text-peach-400' : 'text-brand-700'
+                      }`}
+                    >
+                      {index + 1}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <div
+                      className="flex items-center gap-2 cursor-pointer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        navigate(`/team/${team.partId}`);
+                      }}
+                    >
+                      {team.participation?.teams?.[0]?.teamLogo?.url && (
+                        <img
+                          src={
+                            SERVER_URL +
+                            team.participation.teams[0].teamLogo.url
+                          }
+                          alt={team.team}
+                          className="w-6 h-6 object-contain rounded"
+                        />
+                      )}
+                      <div
+                        className={`text-sm font-medium ${
+                          isTop8 ? 'text-peach-400' : 'text-brand-700'
+                        }`}
+                      >
+                        {team.team}
+                      </div>
+                    </div>
+                  </td>
+                  {simplifiedHeaders.map((header) => {
+                    const rawValue = getTeamStatDisplay(team, header.key);
+                    const displayValue = formatStatValue(header.key, rawValue);
+                    return (
+                      <td
+                        key={header.key}
+                        className="px-4 py-4 whitespace-nowrap"
+                      >
+                        <div
+                          className={`text-sm ${
+                            isTop8
+                              ? 'text-peach-400 font-medium'
+                              : 'text-brand-500'
+                          }`}
+                        >
+                          {displayValue}
+                        </div>
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  // Use simplified headers for basketball, regular table for others
+  if (sportType === 'basketball' && !hasGroups) {
+    return (
+      <div>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <h3 className="text-xl font-display font-semibold text-brand-700 flex items-center gap-2">
+              <Table className="w-5 h-5 text-peach-400" />
+              League Table
+            </h3>
+          </div>
+          <div className="text-sm text-brand-400">{leagueData.season.name}</div>
+        </div>
+        {renderSimplifiedBasketballStandings()}
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -273,60 +410,78 @@ export default function LeagueTable({
                         .map((team, index) => {
                           const displayPosition = index + 1;
                           return (
-                          <tr
-                            key={team.partId}
-                            className="hover:bg-brand-50 transition-colors"
-                          >
-                            <td className="px-4 py-4 whitespace-nowrap">
-                              <div
-                                className={`text-sm font-medium ${
-                                  displayPosition <= 2
-                                    ? 'text-peach-400'
-                                    : 'text-brand-700'
-                                }`}
-                              >
-                                {displayPosition}
-                              </div>
-                            </td>
-                            <td className="px-4 py-4 whitespace-nowrap">
-                              <div
-                                className="flex items-center gap-2 cursor-pointer"
-                                onClick={(e) => {
-                                  e.preventDefault();
-                                  navigate(`/team/${team.partId}`);
-                                }}
-                              >
-                                {team.participation?.teams?.[0]?.teamLogo?.url && (
-                                  <img
-                                    src={SERVER_URL + team.participation.teams[0].teamLogo.url}
-                                    alt={team.team}
-                                    className="w-6 h-6 object-contain rounded"
-                                  />
-                                )}
+                            <tr
+                              key={team.partId}
+                              className="hover:bg-brand-50 transition-colors"
+                            >
+                              <td className="px-4 py-4 whitespace-nowrap">
                                 <div
                                   className={`text-sm font-medium ${
-                                    displayPosition <= 2
+                                    displayPosition <= 8
                                       ? 'text-peach-400'
                                       : 'text-brand-700'
                                   }`}
                                 >
-                                  {team.team}
+                                  {displayPosition}
                                 </div>
-                              </div>
-                            </td>
-                            {statHeaders.map((header) => {
-                              const rawValue = getTeamStatDisplay(team, header.key);
-                              const displayValue = formatStatValue(header.key, rawValue);
-                              return (
-                                <td key={header.key} className="px-4 py-4 whitespace-nowrap">
-                                  <div className={getStatClassName(header.key, rawValue)}>
-                                    {displayValue}
+                              </td>
+                              <td className="px-4 py-4 whitespace-nowrap">
+                                <div
+                                  className="flex items-center gap-2 cursor-pointer"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    navigate(`/team/${team.partId}`);
+                                  }}
+                                >
+                                  {team.participation?.teams?.[0]?.teamLogo
+                                    ?.url && (
+                                    <img
+                                      src={
+                                        SERVER_URL +
+                                        team.participation.teams[0].teamLogo.url
+                                      }
+                                      alt={team.team}
+                                      className="w-6 h-6 object-contain rounded"
+                                    />
+                                  )}
+                                  <div
+                                    className={`text-sm font-medium ${
+                                      displayPosition <= 8
+                                        ? 'text-peach-400'
+                                        : 'text-brand-700'
+                                    }`}
+                                  >
+                                    {team.team}
                                   </div>
-                                </td>
-                              );
-                            })}
-                          </tr>
-                        );
+                                </div>
+                              </td>
+                              {statHeaders.map((header) => {
+                                const rawValue = getTeamStatDisplay(
+                                  team,
+                                  header.key
+                                );
+                                const displayValue = formatStatValue(
+                                  header.key,
+                                  rawValue
+                                );
+                                return (
+                                  <td
+                                    key={header.key}
+                                    className="px-4 py-4 whitespace-nowrap"
+                                  >
+                                    <div
+                                      className={getStatClassName(
+                                        header.key,
+                                        rawValue
+                                      )}
+                                    >
+                                      {displayValue}
+                                    </div>
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          );
                         })}
                     </tbody>
                   </table>
@@ -365,7 +520,7 @@ export default function LeagueTable({
                   <td className="px-4 py-4 whitespace-nowrap">
                     <div
                       className={`text-sm font-medium ${
-                        index < 2 ? 'text-peach-400' : 'text-brand-700'
+                        index < 8 ? 'text-peach-400' : 'text-brand-700'
                       }`}
                     >
                       {index + 1}
@@ -381,14 +536,17 @@ export default function LeagueTable({
                     >
                       {team.participation?.teams?.[0]?.teamLogo?.url && (
                         <img
-                          src={SERVER_URL + team.participation.teams[0].teamLogo.url}
+                          src={
+                            SERVER_URL +
+                            team.participation.teams[0].teamLogo.url
+                          }
                           alt={team.team}
                           className="w-6 h-6 object-contain rounded"
                         />
                       )}
                       <div
                         className={`text-sm font-medium ${
-                          index < 2 ? 'text-peach-400' : 'text-brand-700'
+                          index < 8 ? 'text-peach-400' : 'text-brand-700'
                         }`}
                       >
                         {team.team}
@@ -399,7 +557,10 @@ export default function LeagueTable({
                     const rawValue = getTeamStatDisplay(team, header.key);
                     const displayValue = formatStatValue(header.key, rawValue);
                     return (
-                      <td key={header.key} className="px-4 py-4 whitespace-nowrap">
+                      <td
+                        key={header.key}
+                        className="px-4 py-4 whitespace-nowrap"
+                      >
                         <div className={getStatClassName(header.key, rawValue)}>
                           {displayValue}
                         </div>
