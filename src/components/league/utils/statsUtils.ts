@@ -598,7 +598,7 @@ export const aggregateBasketballPlayers = (
         }
       }
 
-      entry.matches.add(match.id);
+      // Don't add match ID here - only add when player actually participates
       return entry;
     };
 
@@ -606,53 +606,113 @@ export const aggregateBasketballPlayers = (
       players:
         | Array<{ playerName: string; stats?: BasketballPlayerStats }>
         | undefined,
-      teamInfo: typeof homeTeamInfo
+      teamInfo: typeof homeTeamInfo,
+      playersParticipated: Set<string>
     ) => {
       players?.forEach((player) => {
         if (!player.playerName) return;
         const entry = ensurePlayerEntry(teamInfo, player.playerName);
         if (player.stats) {
-          entry.minutes += getBasketballMinutesFromStats(player.stats);
-          entry.points += getBasketballPointsFromStats(player.stats);
-          entry.assists += getBasketballNumericStat(player.stats, 'assists');
-          entry.rebounds += getBasketballReboundsFromStats(player.stats);
-          entry.steals += getBasketballNumericStat(player.stats, 'steals');
-          entry.blocks += getBasketballNumericStat(player.stats, 'blocks');
-          entry.turnovers += getBasketballNumericStat(
-            player.stats,
-            'turnovers'
-          );
-          entry.plusMinus += getBasketballNumericStat(
-            player.stats,
-            'plusMinus'
-          );
+          // Calculate stats first to check if player actually participated
+          const minutes = getBasketballMinutesFromStats(player.stats);
+          const points = getBasketballPointsFromStats(player.stats);
+          const assists = getBasketballNumericStat(player.stats, 'assists');
+          const rebounds = getBasketballReboundsFromStats(player.stats);
+          const steals = getBasketballNumericStat(player.stats, 'steals');
+          const blocks = getBasketballNumericStat(player.stats, 'blocks');
+          const turnovers = getBasketballNumericStat(player.stats, 'turnovers');
+          const plusMinus = getBasketballNumericStat(player.stats, 'plusMinus');
+
+          // Only count as participated if player has meaningful participation
+          // (minutes > 0 OR has any non-zero stat)
+          const hasParticipation =
+            minutes > 0 ||
+            points > 0 ||
+            assists > 0 ||
+            rebounds > 0 ||
+            steals > 0 ||
+            blocks > 0 ||
+            turnovers > 0 ||
+            plusMinus !== 0;
+
+          if (hasParticipation) {
+            // Track that this player participated (has meaningful stats)
+            const normalized = normalizePlayerName(player.playerName);
+            const key =
+              teamId && teamInfo.id === teamId
+                ? normalized
+                : `${normalized}-${teamInfo.id}`;
+            playersParticipated.add(key);
+
+            // Accumulate stats from this match
+            entry.minutes += minutes;
+            entry.points += points;
+            entry.assists += assists;
+            entry.rebounds += rebounds;
+            entry.steals += steals;
+            entry.blocks += blocks;
+            entry.turnovers += turnovers;
+            entry.plusMinus += plusMinus;
+          }
         }
       });
     };
 
     const summary = (match.actionDetails || []).find(isBasketballSummary);
+
+    // Track which players participated in this match (have stats or actions)
+    const playersParticipated = new Set<string>();
+
     if (summary) {
-      applySummaryStats(summary.teams.home.players, homeTeamInfo);
-      applySummaryStats(summary.teams.away.players, awayTeamInfo);
+      // If summary exists, use summary stats only
+      applySummaryStats(
+        summary.teams.home.players,
+        homeTeamInfo,
+        playersParticipated
+      );
+      applySummaryStats(
+        summary.teams.away.players,
+        awayTeamInfo,
+        playersParticipated
+      );
+    } else {
+      // If no summary, process timeline actions
+      (match.actionDetails || []).filter(isTimelineAction).forEach((action) => {
+        if (!action.name) return;
+        const teamInfo = action.isHomeTeam ? homeTeamInfo : awayTeamInfo;
+        const entry = ensurePlayerEntry(teamInfo, action.name);
+        const normalizedType = action.type?.toLowerCase();
+
+        // Track that this player participated (has actions)
+        const normalized = normalizePlayerName(action.name);
+        const playerKey =
+          teamId && teamInfo.id === teamId
+            ? normalized
+            : `${normalized}-${teamInfo.id}`;
+        playersParticipated.add(playerKey);
+
+        // Accumulate stats from actions
+        if (normalizedType === 'assist') {
+          entry.assists += 1;
+        } else if (normalizedType === 'steal') {
+          entry.steals += 1;
+        } else if (normalizedType === 'block') {
+          entry.blocks += 1;
+        } else if (normalizedType === 'turnover') {
+          entry.turnovers += 1;
+        }
+
+        if (normalizedType === 'points' || action.pointType) {
+          entry.points += getBasketballActionPoints(action);
+        }
+      });
     }
 
-    (match.actionDetails || []).filter(isTimelineAction).forEach((action) => {
-      if (!action.name) return;
-      const teamInfo = action.isHomeTeam ? homeTeamInfo : awayTeamInfo;
-      const entry = ensurePlayerEntry(teamInfo, action.name);
-      const normalizedType = action.type?.toLowerCase();
-      if (normalizedType === 'assist') {
-        entry.assists += 1;
-      } else if (normalizedType === 'steal') {
-        entry.steals += 1;
-      } else if (normalizedType === 'block') {
-        entry.blocks += 1;
-      } else if (normalizedType === 'turnover') {
-        entry.turnovers += 1;
-      }
-
-      if (normalizedType === 'points' || action.pointType) {
-        entry.points += getBasketballActionPoints(action);
+    // Add match ID only for players who actually participated (have stats or actions)
+    playersParticipated.forEach((playerKey) => {
+      const entry = result.get(playerKey);
+      if (entry) {
+        entry.matches.add(match.id);
       }
     });
   });
@@ -1630,7 +1690,11 @@ export function generateCompleteLeagueTable(
           if (player.position && !playerStat.position) {
             playerStat.position = player.position;
           }
-          if (player.playerPhoto && !playerStat.playerPhoto && !playerStat.photoUrl) {
+          if (
+            player.playerPhoto &&
+            !playerStat.playerPhoto &&
+            !playerStat.photoUrl
+          ) {
             playerStat.playerPhoto = player.playerPhoto;
           }
           if (!playerStat.teamLogoUrl && team?.teamLogo?.url) {
