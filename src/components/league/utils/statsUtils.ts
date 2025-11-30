@@ -906,25 +906,39 @@ export function calculateTournamentStats(
       if (homeScore > awayScore) {
         homeTeam.W = (parseInt(homeTeam.W) + 1).toString();
         awayTeam.L = (parseInt(awayTeam.L) + 1).toString();
-        if (!isBasketball) {
+        if (isBasketball) {
+          // Basketball: Win = 2 points
+          homeTeam.PTS = (parseInt(homeTeam.PTS) + 2).toString();
+          // Loss = 0 points (already set, but explicit)
+          awayTeam.PTS = (parseInt(awayTeam.PTS) + 0).toString();
+        } else {
           homeTeam.PTS = (parseInt(homeTeam.PTS) + 3).toString();
         }
       } else if (homeScore < awayScore) {
         awayTeam.W = (parseInt(awayTeam.W) + 1).toString();
         homeTeam.L = (parseInt(homeTeam.L) + 1).toString();
-        if (!isBasketball) {
+        if (isBasketball) {
+          // Basketball: Win = 2 points
+          awayTeam.PTS = (parseInt(awayTeam.PTS) + 2).toString();
+          // Loss = 0 points (already set, but explicit)
+          homeTeam.PTS = (parseInt(homeTeam.PTS) + 0).toString();
+        } else {
           awayTeam.PTS = (parseInt(awayTeam.PTS) + 3).toString();
         }
-      } else if (!isBasketball) {
-        homeTeam.D = (parseInt(homeTeam.D) + 1).toString();
-        awayTeam.D = (parseInt(awayTeam.D) + 1).toString();
-        homeTeam.PTS = (parseInt(homeTeam.PTS) + 1).toString();
-        awayTeam.PTS = (parseInt(awayTeam.PTS) + 1).toString();
-      }
-
-      if (isBasketball) {
-        homeTeam.PTS = homeTeam.W;
-        awayTeam.PTS = awayTeam.W;
+      } else {
+        // Draw/Tie
+        if (isBasketball) {
+          // Basketball: Draw = 1 point
+          homeTeam.D = (parseInt(homeTeam.D) + 1).toString();
+          awayTeam.D = (parseInt(awayTeam.D) + 1).toString();
+          homeTeam.PTS = (parseInt(homeTeam.PTS) + 1).toString();
+          awayTeam.PTS = (parseInt(awayTeam.PTS) + 1).toString();
+        } else {
+          homeTeam.D = (parseInt(homeTeam.D) + 1).toString();
+          awayTeam.D = (parseInt(awayTeam.D) + 1).toString();
+          homeTeam.PTS = (parseInt(homeTeam.PTS) + 1).toString();
+          awayTeam.PTS = (parseInt(awayTeam.PTS) + 1).toString();
+        }
       }
 
       // Calculate goal difference
@@ -1429,26 +1443,42 @@ export function generateCompleteLeagueTable(
       if (homeScore > awayScore) {
         homeTeam.W = (parseInt(homeTeam.W) + 1).toString();
         awayTeam.L = (parseInt(awayTeam.L) + 1).toString();
-        if (!isBasketball) {
+        if (isBasketball) {
+          // Basketball: Win = 2 points
+          homeTeam.PTS = (parseInt(homeTeam.PTS) + 2).toString();
+          // Loss = 0 points (already set, but explicit)
+          awayTeam.PTS = (parseInt(awayTeam.PTS) + 0).toString();
+        } else {
           homeTeam.PTS = (parseInt(homeTeam.PTS) + 3).toString();
         }
       } else if (homeScore < awayScore) {
         awayTeam.W = (parseInt(awayTeam.W) + 1).toString();
         homeTeam.L = (parseInt(homeTeam.L) + 1).toString();
-        if (!isBasketball) {
+        if (isBasketball) {
+          // Basketball: Win = 2 points
+          awayTeam.PTS = (parseInt(awayTeam.PTS) + 2).toString();
+          // Loss = 0 points (already set, but explicit)
+          homeTeam.PTS = (parseInt(homeTeam.PTS) + 0).toString();
+        } else {
           awayTeam.PTS = (parseInt(awayTeam.PTS) + 3).toString();
         }
-      } else if (!isBasketball) {
-        homeTeam.D = (parseInt(homeTeam.D) + 1).toString();
-        awayTeam.D = (parseInt(awayTeam.D) + 1).toString();
-        homeTeam.PTS = (parseInt(homeTeam.PTS) + 1).toString();
-        awayTeam.PTS = (parseInt(awayTeam.PTS) + 1).toString();
+      } else {
+        // Draw/Tie
+        if (isBasketball) {
+          // Basketball: Draw = 1 point
+          homeTeam.D = (parseInt(homeTeam.D) + 1).toString();
+          awayTeam.D = (parseInt(awayTeam.D) + 1).toString();
+          homeTeam.PTS = (parseInt(homeTeam.PTS) + 1).toString();
+          awayTeam.PTS = (parseInt(awayTeam.PTS) + 1).toString();
+        } else {
+          homeTeam.D = (parseInt(homeTeam.D) + 1).toString();
+          awayTeam.D = (parseInt(awayTeam.D) + 1).toString();
+          homeTeam.PTS = (parseInt(homeTeam.PTS) + 1).toString();
+          awayTeam.PTS = (parseInt(awayTeam.PTS) + 1).toString();
+        }
       }
 
-      if (isBasketball) {
-        homeTeam.PTS = homeTeam.W;
-        awayTeam.PTS = awayTeam.W;
-      } else {
+      if (!isBasketball) {
         // Calculate goal difference for non-basketball sports
         homeTeam.GD = (
           parseInt(homeTeam.GF) - parseInt(homeTeam.GA)
