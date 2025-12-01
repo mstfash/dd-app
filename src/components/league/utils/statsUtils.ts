@@ -548,6 +548,17 @@ export const aggregateBasketballPlayers = (
       lineup: awayLineup,
     };
 
+    // Helper function to check if a player is in the lineup
+    const isPlayerInLineup = (
+      teamInfo: typeof homeTeamInfo,
+      playerName: string
+    ): boolean => {
+      const normalized = normalizePlayerName(playerName);
+      return teamInfo.lineup.some(
+        (player) => normalizePlayerName(player.name) === normalized
+      );
+    };
+
     const ensurePlayerEntry = (
       teamInfo: typeof homeTeamInfo,
       playerName: string
@@ -611,6 +622,18 @@ export const aggregateBasketballPlayers = (
     ) => {
       players?.forEach((player) => {
         if (!player.playerName) return;
+
+        // If player has stats in summary, they played - trust the summary
+        // But if they have no stats AND are not in lineup, exclude them
+        const hasStats = player.stats !== undefined && player.stats !== null;
+        const inLineup = isPlayerInLineup(teamInfo, player.playerName);
+
+        // Only process if: (has stats) OR (in lineup)
+        // This preserves stats while filtering out phantom players
+        if (!hasStats && !inLineup) {
+          return;
+        }
+
         const entry = ensurePlayerEntry(teamInfo, player.playerName);
         if (player.stats) {
           // Calculate stats first to check if player actually participated
@@ -665,21 +688,39 @@ export const aggregateBasketballPlayers = (
 
     if (summary) {
       // If summary exists, use summary stats only
-      applySummaryStats(
-        summary.teams.home.players,
-        homeTeamInfo,
-        playersParticipated
-      );
-      applySummaryStats(
-        summary.teams.away.players,
-        awayTeamInfo,
-        playersParticipated
-      );
+      // When teamId is provided, only process that team's players
+      if (!teamId || homeTeamId === teamId) {
+        applySummaryStats(
+          summary.teams.home.players,
+          homeTeamInfo,
+          playersParticipated
+        );
+      }
+      if (!teamId || awayTeamId === teamId) {
+        applySummaryStats(
+          summary.teams.away.players,
+          awayTeamInfo,
+          playersParticipated
+        );
+      }
     } else {
       // If no summary, process timeline actions
+      // For timeline actions, we need to be more careful - only count players in lineup
+      // because action details might have players from other teams or errors
       (match.actionDetails || []).filter(isTimelineAction).forEach((action) => {
         if (!action.name) return;
         const teamInfo = action.isHomeTeam ? homeTeamInfo : awayTeamInfo;
+
+        // When teamId is provided, only process actions for that team
+        if (teamId && teamInfo.id !== teamId) {
+          return;
+        }
+
+        // Only process players who are in the lineup (starters or substitutes)
+        if (!isPlayerInLineup(teamInfo, action.name)) {
+          return;
+        }
+
         const entry = ensurePlayerEntry(teamInfo, action.name);
         const normalizedType = action.type?.toLowerCase();
 
@@ -1601,6 +1642,23 @@ export function generateCompleteLeagueTable(
         addNumericStatValue(player, 'points', value);
       };
 
+      // Get lineup players for this match to filter action details
+      const lineup = match.lineUp || [];
+      const homeLineup = lineup.filter((player) => player.isHomeTeam);
+      const awayLineup = lineup.filter((player) => !player.isHomeTeam);
+
+      // Helper to check if player is in lineup
+      const isPlayerInLineupForMatch = (
+        playerName: string,
+        isHomeTeam: boolean
+      ): boolean => {
+        const normalized = normalizePlayerName(playerName);
+        const relevantLineup = isHomeTeam ? homeLineup : awayLineup;
+        return relevantLineup.some(
+          (player) => normalizePlayerName(player.name) === normalized
+        );
+      };
+
       match?.actionDetails?.forEach((action) => {
         if (isBasketballSummary(action)) return;
         if (!isTimelineAction(action)) return;
@@ -1612,6 +1670,17 @@ export function generateCompleteLeagueTable(
         ) {
           return;
         }
+
+        // Only process players who are in the lineup
+        if (
+          !isPlayerInLineupForMatch(
+            timelineAction.name,
+            timelineAction.isHomeTeam
+          )
+        ) {
+          return;
+        }
+
         const teamId = timelineAction.isHomeTeam
           ? match.homeTeam.id
           : match.awayTeam.id;
@@ -1741,10 +1810,31 @@ export function generateCompleteLeagueTable(
         const processSnapshot = (
           snapshot: BasketballMatchSummary['teams']['home'],
           teamInfo: MatchInterface['homeTeam'],
-          teamId: string
+          teamId: string,
+          isHomeTeam: boolean
         ) => {
           snapshot.players?.forEach((playerSnapshot) => {
             if (!playerSnapshot.playerName) return;
+
+            // If player has stats in summary, they played - trust the summary data
+            // Only filter if they have no meaningful stats AND are not in lineup
+            const snapshotStats = playerSnapshot.stats || {};
+            const hasStats =
+              computeBasketballPointsFromStats(snapshotStats) > 0 ||
+              getBasketballStatNumber(snapshotStats, 'assists') > 0 ||
+              computeBasketballReboundsFromStats(snapshotStats) > 0 ||
+              computeBasketballMinutesFromStats(snapshotStats) > 0 ||
+              getBasketballStatNumber(snapshotStats, 'steals') > 0 ||
+              getBasketballStatNumber(snapshotStats, 'blocks') > 0 ||
+              getBasketballStatNumber(snapshotStats, 'turnovers') > 0;
+
+            if (
+              !hasStats &&
+              !isPlayerInLineupForMatch(playerSnapshot.playerName, isHomeTeam)
+            ) {
+              return;
+            }
+
             const playerName = playerSnapshot.playerName;
             const playerKey = `${playerName}-${teamId}`;
             if (!playerStats.has(playerKey)) {
@@ -1787,7 +1877,7 @@ export function generateCompleteLeagueTable(
             if (playerSnapshot.position && !player.position) {
               player.position = playerSnapshot.position;
             }
-            const stats = playerSnapshot.stats || {};
+            const stats = snapshotStats;
             const points = computeBasketballPointsFromStats(stats);
             addNumericStatValue(player, 'goals', points);
             addNumericStatValue(player, 'points', points);
@@ -1812,14 +1902,16 @@ export function generateCompleteLeagueTable(
           processSnapshot(
             summary.teams.home,
             match.homeTeam,
-            match.homeTeam.id
+            match.homeTeam.id,
+            true
           );
         }
         if (summary.teams.away && match.awayTeam?.id) {
           processSnapshot(
             summary.teams.away,
             match.awayTeam,
-            match.awayTeam.id
+            match.awayTeam.id,
+            false
           );
         }
       }
