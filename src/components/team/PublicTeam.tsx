@@ -246,12 +246,19 @@ export default function PublicTeam() {
         source: 'derived' as const,
       }));
 
-    return [
+    const allPlayers = [
       ...mappedOfficial.filter(
         (player) => player.name && player.name !== 'Player'
       ),
       ...derivedPlayers,
     ];
+    
+    // Sort players alphabetically by name
+    return allPlayers.sort((a, b) => {
+      const nameA = a.name.toLowerCase();
+      const nameB = b.name.toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
   }, [playersData?.players, statsList, statsMap, participation?.teamAdmin?.id]);
 
   if (isLoading) {

@@ -948,10 +948,9 @@ export function calculateTournamentStats(
         homeTeam.W = (parseInt(homeTeam.W) + 1).toString();
         awayTeam.L = (parseInt(awayTeam.L) + 1).toString();
         if (isBasketball) {
-          // Basketball: Win = 2 points
+          // Basketball: Win = 2 points, Loss = 1 point
           homeTeam.PTS = (parseInt(homeTeam.PTS) + 2).toString();
-          // Loss = 0 points (already set, but explicit)
-          awayTeam.PTS = (parseInt(awayTeam.PTS) + 0).toString();
+          awayTeam.PTS = (parseInt(awayTeam.PTS) + 1).toString();
         } else {
           homeTeam.PTS = (parseInt(homeTeam.PTS) + 3).toString();
         }
@@ -959,10 +958,9 @@ export function calculateTournamentStats(
         awayTeam.W = (parseInt(awayTeam.W) + 1).toString();
         homeTeam.L = (parseInt(homeTeam.L) + 1).toString();
         if (isBasketball) {
-          // Basketball: Win = 2 points
+          // Basketball: Win = 2 points, Loss = 1 point
           awayTeam.PTS = (parseInt(awayTeam.PTS) + 2).toString();
-          // Loss = 0 points (already set, but explicit)
-          homeTeam.PTS = (parseInt(homeTeam.PTS) + 0).toString();
+          homeTeam.PTS = (parseInt(homeTeam.PTS) + 1).toString();
         } else {
           awayTeam.PTS = (parseInt(awayTeam.PTS) + 3).toString();
         }
@@ -997,16 +995,12 @@ export function calculateTournamentStats(
       awayTeam.FP = (match.awayTeamFairPlayPoints ? 1 : 0).toString();
     });
 
-    // Sort table by points, GD, then h2h
+    // Sort table by points, then PF for basketball, GD for others
     const table = Array.from(teamsMap.values()).sort((a, b) => {
       if (sport === 'basketball') {
-        if (parseInt(a.W) !== parseInt(b.W)) {
-          return parseInt(b.W) - parseInt(a.W);
-        }
-        const diffA = parseInt(a.PD || a.GD || '0');
-        const diffB = parseInt(b.PD || b.GD || '0');
-        if (diffA !== diffB) {
-          return diffB - diffA;
+        // Basketball: Sort by Points (PTS) first, then Points For (PF)
+        if (parseInt(a.PTS) !== parseInt(b.PTS)) {
+          return parseInt(b.PTS) - parseInt(a.PTS);
         }
         return parseInt(b.PF || b.GF || '0') - parseInt(a.PF || a.GF || '0');
       }
@@ -1485,10 +1479,9 @@ export function generateCompleteLeagueTable(
         homeTeam.W = (parseInt(homeTeam.W) + 1).toString();
         awayTeam.L = (parseInt(awayTeam.L) + 1).toString();
         if (isBasketball) {
-          // Basketball: Win = 2 points
+          // Basketball: Win = 2 points, Loss = 1 point
           homeTeam.PTS = (parseInt(homeTeam.PTS) + 2).toString();
-          // Loss = 0 points (already set, but explicit)
-          awayTeam.PTS = (parseInt(awayTeam.PTS) + 0).toString();
+          awayTeam.PTS = (parseInt(awayTeam.PTS) + 1).toString();
         } else {
           homeTeam.PTS = (parseInt(homeTeam.PTS) + 3).toString();
         }
@@ -1496,10 +1489,9 @@ export function generateCompleteLeagueTable(
         awayTeam.W = (parseInt(awayTeam.W) + 1).toString();
         homeTeam.L = (parseInt(homeTeam.L) + 1).toString();
         if (isBasketball) {
-          // Basketball: Win = 2 points
+          // Basketball: Win = 2 points, Loss = 1 point
           awayTeam.PTS = (parseInt(awayTeam.PTS) + 2).toString();
-          // Loss = 0 points (already set, but explicit)
-          homeTeam.PTS = (parseInt(homeTeam.PTS) + 0).toString();
+          homeTeam.PTS = (parseInt(homeTeam.PTS) + 1).toString();
         } else {
           awayTeam.PTS = (parseInt(awayTeam.PTS) + 3).toString();
         }
@@ -1534,16 +1526,12 @@ export function generateCompleteLeagueTable(
       awayTeam.FP = (match.awayTeamFairPlayPoints ? 1 : 0).toString();
     });
 
-    // Sort table by points, GD, then h2h
+    // Sort table by points, then PF for basketball, GD for others
     const table = Array.from(teamsMap.values()).sort((a, b) => {
       if (sport === 'basketball') {
-        if (parseInt(a.W) !== parseInt(b.W)) {
-          return parseInt(b.W) - parseInt(a.W);
-        }
-        const diffA = parseInt(a.PD || a.GD || '0');
-        const diffB = parseInt(b.PD || b.GD || '0');
-        if (diffA !== diffB) {
-          return diffB - diffA;
+        // Basketball: Sort by Points (PTS) first, then Points For (PF)
+        if (parseInt(a.PTS) !== parseInt(b.PTS)) {
+          return parseInt(b.PTS) - parseInt(a.PTS);
         }
         return parseInt(b.PF || b.GF || '0') - parseInt(a.PF || a.GF || '0');
       }
